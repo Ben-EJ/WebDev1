@@ -4,7 +4,7 @@
     <head>
     </head>
 <body>
-<h1>Web Dev Coursework</h1>
+<h1>Generate CSV</h1>
 <?php
 
 @date_default_timezone_set("GMT");
@@ -74,42 +74,24 @@ function sortCsv($csvToCreate, $fileHeader){
     foreach($csvToCreate as &$initalCSV){
         fwrite($initalCSV, $fileHeader);
     }
-
-    $count = 0;
-    $fileDataArrayExploded = array();
-
     $file = fopen("air-quality-data-2004-2019.csv","r");
     $flagSkipedFirst = false;
-
     while ($data = fgets($file)) {
         if($flagSkipedFirst){
-            $count = $count + 1;
-        array_push($fileDataArrayExploded, multiSpliter($data));
-        
-        if($count == 10000){
-            for($i = 0; $i < count($fileDataArrayExploded); $i++){
-                //siteID,ts,nox,no2,no,pm10,nvpm10,vpm10,nvpm2.5,pm2.5,vpm2.5,co,o3,so2,loc,lat,long
-                $reformated = 
-                  $fileDataArrayExploded[$i][4]  . "," .  convertToTimeStamp($fileDataArrayExploded[$i][0])  . ","
-                . $fileDataArrayExploded[$i][1]  . "," .  $fileDataArrayExploded[$i][2]  . ","
-                . $fileDataArrayExploded[$i][3]  . "," .  $fileDataArrayExploded[$i][5]  . ","
-                . $fileDataArrayExploded[$i][6]  . "," .  $fileDataArrayExploded[$i][7]  . ","
-                . $fileDataArrayExploded[$i][8]  . "," .  $fileDataArrayExploded[$i][9]  . ","
-                . $fileDataArrayExploded[$i][10] . "," .  $fileDataArrayExploded[$i][11] . ","
-                . $fileDataArrayExploded[$i][12] . "," .  $fileDataArrayExploded[$i][13] . ","
-                . $fileDataArrayExploded[$i][17] . "," .  $fileDataArrayExploded[$i][18] . ","
-                . $fileDataArrayExploded[$i][19] . PHP_EOL;
-
-                fwrite($csvToCreate[$fileDataArrayExploded[$i][4]], $reformated);
-            }
-            $count = 0;
-
-            unset($fileDataArrayExploded);
-            $fileDataArrayExploded = array();
-    
-            unset($fileDataArray);
-            $fileDataArray = array();
-        }
+            $dataSplitArray = array();
+            $dataSplitArray = multiSpliter($data);
+        //siteID,ts,nox,no2,no,pm10,nvpm10,vpm10,nvpm2.5,pm2.5,vpm2.5,co,o3,so2,loc,lat,long
+            $reformated = 
+                $dataSplitArray[4]  . "," .  convertToTimeStamp($dataSplitArray[0])  . ","
+                . $dataSplitArray[1]  . "," .  $dataSplitArray[2]  . ","
+                . $dataSplitArray[3]  . "," .  $dataSplitArray[5]  . ","
+                . $dataSplitArray[6]  . "," .  $dataSplitArray[7]  . ","
+                . $dataSplitArray[8]  . "," .  $dataSplitArray[9]  . ","
+                . $dataSplitArray[10] . "," .  $dataSplitArray[11] . ","
+                . $dataSplitArray[12] . "," .  $dataSplitArray[13] . ","
+                . $dataSplitArray[17] . "," .  $dataSplitArray[18] . ","
+                . $dataSplitArray[19] . PHP_EOL;
+            fwrite($csvToCreate[$dataSplitArray[4]], $reformated);
         }
         $flagSkipedFirst = true;
     }

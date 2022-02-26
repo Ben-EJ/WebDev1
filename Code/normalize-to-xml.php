@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<h1>Hello World</h1>
+<h1>Generate XML</h1>
 <html>
     <head>
 
@@ -53,12 +53,34 @@ function xmlCreate($xmlToCreate){
         fwrite($xmlFiles, $firstLine);
     }
 }
-function createXMLRecordd($ts,$nox,$no2,$no,$pm10,$nvpm10,$vpm10,$nvpmTwoFive,$pmTwoFive,$vpmTwoFive,$co,$o3,$so2){
-    $finalString = "";
 
+function createXMLRecordd($array){
+    unset($array[0]);
+    unset($array[14]);
+    unset($array[15]);
+    unset($array[16]);
+    $array = array_values($array);
+
+    $fieldArray = array(" ts='"," nox='"," no2='"," no='"," pm10='"," nvpm10='"," vpm10='",
+    " nvpm2.5='"," pm2.5='", " vpm2.5='"," co='"," o3='"," so2='");
+    
+    $finalString = "<rec";
+    
+    for($i = 0; $i < count($array); $i++){
+        if($array[$i] != ";"){
+            $finalString = $finalString." ".$fieldArray[$i].$array[$i]."' ";
+        }
+    }
+    $finalString = $finalString."/>";
     return $finalString;
 }
-
+function test(){
+    $array = array("188","1084492800","73.0","42.0","20.0","14.0",";",";",";",";",";","0.2","38.0","3.0","AURN Bristol Centre","51.4572041156","-2.58564914143");
+    $xml = createXMLRecordd($array);
+    $testFile = fopen("test.xml", "a");
+    fWrite($testFile, $xml);
+}
+//ts,nox,no2,no,pm10,nvpm10,vpm10,nvpm2.5,pm2.5,vpm2.5,co,o3,so2
 function xmlWrite($xmlToCreate, $csvToPull){
     for($i = 0; $i < count($xmlToCreate); $i++){
        $flagSecondLine = true;
@@ -71,7 +93,7 @@ function xmlWrite($xmlToCreate, $csvToPull){
                 fWrite($xmlToCreate[$i], $secondLine);
                 $flagSecondLine = false;
             }elseif($count > 1){//Code to add records goes here
-                $string = createXMLRecordd($array[0], $array[0],$array[0],$array[0],$array[0],$array[0],$array[0],$array[0],$array[0],$array[0],$array[0],$array[0],$array[0]);
+                $string = createXMLRecordd($array);
                 fWrite($xmlToCreate[$i], $string. PHP_EOL);
             }
             $count++;
@@ -81,6 +103,7 @@ function xmlWrite($xmlToCreate, $csvToPull){
 }
 xmlCreate($xmlToCreate);
 xmlWrite($xmlToCreate, $csvToPull);
+
 ?>
 </body>
 </html>
