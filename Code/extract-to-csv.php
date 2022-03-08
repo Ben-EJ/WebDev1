@@ -67,7 +67,16 @@ function convertToTimeStamp($dateTime){//2004-05-14T07:00:00+00:00
     $dataSplitFurther = array();
     $dataSplit =  explode("T", $dateTime);
     $dataSplitFurther = explode("+", $dataSplit[1]);
-    return strtotime($dataSplit[0]." ".$dataSplitFurther[1]);
+    $date = explode("-",$dataSplit[0]);
+    
+    if((int) $date[0] >= 2010){
+        echo "<br/>";
+        echo $date[0];
+        return strtotime($dataSplit[0]." ".$dataSplitFurther[1]);
+    }else{
+        return "none";
+    }
+    
  }
 //4 element is 
 function sortCsv($csvToCreate, $fileHeader){
@@ -80,18 +89,23 @@ function sortCsv($csvToCreate, $fileHeader){
         if($flagSkipedFirst){
             $dataSplitArray = array();
             $dataSplitArray = multiSpliter($data);
+            $date = convertToTimeStamp($dataSplitArray[0]);
+            
+            if(strcmp($date, "none") !== 0){
+                $reformated = 
+                $dataSplitArray[4]  . "," .  $date  . ","
+              . $dataSplitArray[1]  . "," .  $dataSplitArray[2]  . ","
+              . $dataSplitArray[3]  . "," .  $dataSplitArray[5]  . ","
+              . $dataSplitArray[6]  . "," .  $dataSplitArray[7]  . ","
+              . $dataSplitArray[8]  . "," .  $dataSplitArray[9]  . ","
+              . $dataSplitArray[10] . "," .  $dataSplitArray[11] . ","
+              . $dataSplitArray[12] . "," .  $dataSplitArray[13] . ","
+              . $dataSplitArray[17] . "," .  $dataSplitArray[18] . ","
+              . $dataSplitArray[19] . PHP_EOL;
+             fwrite($csvToCreate[$dataSplitArray[4]], $reformated);
+            }
         //siteID,ts,nox,no2,no,pm10,nvpm10,vpm10,nvpm2.5,pm2.5,vpm2.5,co,o3,so2,loc,lat,long
-            $reformated = 
-                $dataSplitArray[4]  . "," .  convertToTimeStamp($dataSplitArray[0])  . ","
-                . $dataSplitArray[1]  . "," .  $dataSplitArray[2]  . ","
-                . $dataSplitArray[3]  . "," .  $dataSplitArray[5]  . ","
-                . $dataSplitArray[6]  . "," .  $dataSplitArray[7]  . ","
-                . $dataSplitArray[8]  . "," .  $dataSplitArray[9]  . ","
-                . $dataSplitArray[10] . "," .  $dataSplitArray[11] . ","
-                . $dataSplitArray[12] . "," .  $dataSplitArray[13] . ","
-                . $dataSplitArray[17] . "," .  $dataSplitArray[18] . ","
-                . $dataSplitArray[19] . PHP_EOL;
-            fwrite($csvToCreate[$dataSplitArray[4]], $reformated);
+           
         }
         $flagSkipedFirst = true;
     }
