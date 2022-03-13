@@ -1,18 +1,28 @@
 <!DOCTYPE html>
-<h1>Generate XML</h1>
+<h1>Generated XML</h1>
 <html>
     <head>
 
     </head>
 <body>
+    
+<script>
+function home() 
+{ 
+    location.href = 'chart/index.php'; 
+}
+</script>
+
+<button onclick="home()">Home</button>
+
 <?php
 $csvToPull = array(
-    fopen("csvFiles/data-188.csv", "r"), 
-    fopen("csvFiles/data-203.csv", "r"),
-    fopen("csvFiles/data-206.csv", "r"),
+    fopen("csvFiles/data-188.csv","r"), 
+    fopen("csvFiles/data-203.csv","r"),
+    fopen("csvFiles/data-206.csv","r"),
     fopen("csvFiles/data-209.csv","r"),
-    fopen("csvFiles/data-213.csv", "r"),
-    fopen("csvFiles/data-215.csv", "r"),
+    fopen("csvFiles/data-213.csv","r"),
+    fopen("csvFiles/data-215.csv","r"),
     fopen("csvFiles/data-228.csv","r"),
     fopen("csvFiles/data-270.csv","r"),
     fopen("csvFiles/data-271.csv","r"),
@@ -27,24 +37,24 @@ $csvToPull = array(
     fopen("csvFiles/data-501.csv","r")
 );
 $xmlToCreate = array(
-    fopen("xmlFiles/data-188.xml", "a"), 
-    fopen("xmlFiles/data-203.xml", "a"),
-    fopen("xmlFiles/data-206.xml", "a"),
-    fopen("xmlFiles/data-209.xml","a"),
-    fopen("xmlFiles/data-213.xml", "a"),
-    fopen("xmlFiles/data-215.xml", "a"),
-    fopen("xmlFiles/data-228.xml","a"),
-    fopen("xmlFiles/data-270.xml","a"),
-    fopen("xmlFiles/data-271.xml","a"),
-    fopen("xmlFiles/data-375.xml","a"),
-    fopen("xmlFiles/data-395.xml","a"),
-    fopen("xmlFiles/data-452.xml","a"),
-    fopen("xmlFiles/data-447.xml","a"),
-    fopen("xmlFiles/data-459.xml","a"),
-    fopen("xmlFiles/data-463.xml","a"),
-    fopen("xmlFiles/data-481.xml","a"),
-    fopen("xmlFiles/data-500.xml","a"),
-    fopen("xmlFiles/data-501.xml","a")
+    fopen("xmlFiles/data-188.xml","w"), 
+    fopen("xmlFiles/data-203.xml","w"),
+    fopen("xmlFiles/data-206.xml","w"),
+    fopen("xmlFiles/data-209.xml","w"),
+    fopen("xmlFiles/data-213.xml","w"),
+    fopen("xmlFiles/data-215.xml","w"),
+    fopen("xmlFiles/data-228.xml","w"),
+    fopen("xmlFiles/data-270.xml","w"),
+    fopen("xmlFiles/data-271.xml","w"),
+    fopen("xmlFiles/data-375.xml","w"),
+    fopen("xmlFiles/data-395.xml","w"),
+    fopen("xmlFiles/data-452.xml","w"),
+    fopen("xmlFiles/data-447.xml","w"),
+    fopen("xmlFiles/data-459.xml","w"),
+    fopen("xmlFiles/data-463.xml","w"),
+    fopen("xmlFiles/data-481.xml","w"),
+    fopen("xmlFiles/data-500.xml","w"),
+    fopen("xmlFiles/data-501.xml","w")
 );
 
 function xmlCreate($xmlToCreate){
@@ -54,7 +64,7 @@ function xmlCreate($xmlToCreate){
     }
 }
 
-function createXMLRecordd($array){
+function createXMLRecord($array){
     unset($array[0]);
     unset($array[14]);
     unset($array[15]);
@@ -74,12 +84,7 @@ function createXMLRecordd($array){
     $finalString = $finalString."/>";
     return $finalString;
 }
-function test(){
-    $array = array("188","1084492800","73.0","42.0","20.0","14.0",";",";",";",";",";","0.2","38.0","3.0","AURN Bristol Centre","51.4572041156","-2.58564914143");
-    $xml = createXMLRecordd($array);
-    $testFile = fopen("test.xml", "a");
-    fWrite($testFile, $xml);
-}
+
 //ts,nox,no2,no,pm10,nvpm10,vpm10,nvpm2.5,pm2.5,vpm2.5,co,o3,so2
 function xmlWrite($xmlToCreate, $csvToPull){
     for($i = 0; $i < count($xmlToCreate); $i++){
@@ -89,11 +94,13 @@ function xmlWrite($xmlToCreate, $csvToPull){
        while ($data = fgets($csvToPull[$i])){
             $array = explode(",", $data);
             if($flagSecondLine && $count == 1){
-                $secondLine = "<station id='".$array[0]."' "."name='".$array[14]."' "."geocode='".$array[15].",".$array[16]."'>".PHP_EOL;
+                //rtrim() used to mitigate a bug is cause by PHP_EOL adding a ghost char after $array[16] making "'> " move on the next line
+                $secondLine = "<station id='".$array[0]."' "."name='".$array[14]."' " . "geocode='" .$array[15]. "," . rtrim($array[16], PHP_EOL) . "'> ";
+                $secondLine = $secondLine . PHP_EOL;
                 fWrite($xmlToCreate[$i], $secondLine);
                 $flagSecondLine = false;
             }elseif($count > 1){//Code to add records goes here
-                $string = createXMLRecordd($array);
+                $string = createXMLRecord($array);
                 fWrite($xmlToCreate[$i], $string. PHP_EOL);
             }
             $count++;
@@ -101,9 +108,11 @@ function xmlWrite($xmlToCreate, $csvToPull){
         fWrite($xmlToCreate[$i], "</station>". PHP_EOL);
     }
 }
+$st = microtime(true);
 xmlCreate($xmlToCreate);
 xmlWrite($xmlToCreate, $csvToPull);
-
+echo '<p>It took ';
+echo microtime(true) - $st;
 ?>
 </body>
 </html>
