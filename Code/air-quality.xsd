@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    
+    <xs:element name="station">
+        <xs:complexType>
+            
+            <xs:attribute name="id" type="xs:string" use="required"/>
+            <xs:attribute name="name" type="xs:string" use="required"/>
+            <xs:attribute name="geocode" type="xs:string" use="required"/>
+ 
+            <xs:element name="rec"\>
+                
+        </xs:complexType>
+    </xs:element>
+    
+   </xs:schema> 
