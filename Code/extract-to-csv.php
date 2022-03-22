@@ -78,13 +78,7 @@ function convertToTimeStamp($dateTime){//2004-05-14T07:00:00+00:00
     $dataSplitFurther = array();
     $dataSplit =  explode("T", $dateTime);
     $dataSplitFurther = explode("+", $dataSplit[1]);
-    //$date = explode("-", $dataSplit[0]);
-    
-    //if((int) $date[0] <= 2010){
-        return strtotime($dataSplit[0]." ".$dataSplitFurther[0]);
-   // }else{
-     //   return "none";
-   // }
+    return strtotime($dataSplit[0]." ".$dataSplitFurther[0]);
  }
 //4 element is 
 function sortCsv($csvToCreate, $fileHeader){
@@ -99,7 +93,7 @@ function sortCsv($csvToCreate, $fileHeader){
             $dataSplitArray = array();
             $dataSplitArray = multiSpliter($data);
             $date = convertToTimeStamp($dataSplitArray[0]);
-            //if($date != "none"){
+    
             if($dataSplitArray[11] != ";" || $dataSplitArray[1] != ";"){
                 $reformated = 
                 $dataSplitArray[4]  . "," .  $date  . ","
@@ -113,14 +107,10 @@ function sortCsv($csvToCreate, $fileHeader){
               . $dataSplitArray[19] . PHP_EOL;
              fwrite($csvToCreate[$dataSplitArray[4]], $reformated);
             }
-        //}           
+               
     }
         $flagSkipedFirst = true;
     }
-    //foreach($csvToCreate as &$files){
-    //    fclose($files);
-    //}
-    //fclose($file);
 }
 $st = microtime(true);
 sortCsv($csvToCreate,$fileHeader);
