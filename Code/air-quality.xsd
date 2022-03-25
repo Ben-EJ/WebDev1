@@ -3,23 +3,174 @@
   <xs:element name="station">
     <xs:complexType>
       <xs:sequence>
-        <xs:element ref="rec"/>
+        <xs:element maxOccurs="unbounded" ref="rec"/>
       </xs:sequence>
+      
+      <xs:attribute name="id">
+        <xs:simpleType>
+          <xs:restriction base="xs:integer">
+            <xs:enumeration value="188" />
+            <xs:enumeration value="203" />
+            <xs:enumeration value="206" />
+            <xs:enumeration value="209" />
+            <xs:enumeration value="213" />
+            <xs:enumeration value="215" />
+            <xs:enumeration value="228" />
+            <xs:enumeration value="270" />
+            <xs:enumeration value="271" />
+            <xs:enumeration value="375" />
+            <xs:enumeration value="395" />
+            <xs:enumeration value="447" />
+            <xs:enumeration value="452" />
+            <xs:enumeration value="459" />
+            <xs:enumeration value="463" />
+            <xs:enumeration value="500" />
+            <xs:enumeration value="501" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      
+      <xs:attribute name="name">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="AURN Bristol Centre" />
+            <xs:enumeration value="Brislington Depot" />
+            <xs:enumeration value="Rupert Street" />
+            <xs:enumeration value="IKEA M32" />
+            <xs:enumeration value="Old Market" />
+            <xs:enumeration value="Parson Street School" />
+            <xs:enumeration value="Temple Meads Station" />
+            <xs:enumeration value="Wells Road" />
+            <xs:enumeration value="Trailer Portway PR" />
+            <xs:enumeration value="Newfoundland Road Police Station" />
+            <xs:enumeration value="Shiners Garage" />
+            <xs:enumeration value="Bath Road" />
+            <xs:enumeration value="AURN St Pauls" />
+            <xs:enumeration value="Cheltenham Road \ Station Road" />
+            <xs:enumeration value="Fishponds Road" />
+            <xs:enumeration value="Temple Way" />
+            <xs:enumeration value="Colston Avenue" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      
       <xs:attribute name="geocode" use="required"/>
-      <xs:attribute name="id" use="required" type="xs:integer"/>
-      <xs:attribute name="name" use="required"/>
+      
     </xs:complexType>
   </xs:element>
+  
   <xs:element name="rec">
     <xs:complexType>
-      <xs:attribute name="co" type="xs:decimal"/>
-      <xs:attribute name="no" type="xs:decimal"/>
-      <xs:attribute name="no2" type="xs:decimal"/>
-      <xs:attribute name="nox" type="xs:decimal"/>
-      <xs:attribute name="o3" type="xs:decimal"/>
-      <xs:attribute name="pm10" type="xs:decimal"/>
-      <xs:attribute name="so2" type="xs:decimal"/>
-      <xs:attribute name="ts" type="xs:integer"/>
+      <xs:attribute name="ts" type="xs:integer"/>   
+      
+      <xs:attribute name="nox">
+        <xs:simpleType>
+          <xs:restriction base="xs:decimal">
+            <xs:minInclusive value="-50.0"/>
+            <xs:maxInclusive value="3000.0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      
+      <xs:attribute name="no2">
+        <xs:simpleType>
+          <xs:restriction base="xs:decimal">
+            <xs:minInclusive value="-50.0"/>
+            <xs:maxInclusive value="3000.0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+   
+      <xs:attribute name="no">
+        <xs:simpleType>
+          <xs:restriction base="xs:decimal">
+            <xs:minInclusive value="-50.0"/>
+            <xs:maxInclusive value="3000.0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      
+      <xs:attribute name="pm10">
+        <xs:simpleType>
+          <xs:restriction base="xs:decimal">
+            <xs:minInclusive value="-20.0"/>
+            <xs:maxInclusive value="3000.0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      
+      <xs:attribute name="nvpm10">
+        <xs:simpleType>
+          <xs:restriction base="xs:decimal">
+            <xs:minInclusive value="-10.0"/>
+            <xs:maxInclusive value="3000.0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      
+      <xs:attribute name="vpm10">
+        <xs:simpleType>
+          <xs:restriction base="xs:decimal">
+            <xs:minInclusive value="-10.0"/>
+            <xs:maxInclusive value="3000.0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      
+      <xs:attribute name="nvpm2.5">
+        <xs:simpleType>
+          <xs:restriction base="xs:decimal">
+            <xs:minInclusive value="-10.0"/>
+            <xs:maxInclusive value="3000.0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      
+      <xs:attribute name="pm2.5">
+        <xs:simpleType>
+          <xs:restriction base="xs:decimal">
+            <xs:minInclusive value="-10.0"/>
+            <xs:maxInclusive value="3000.0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      
+      <xs:attribute name="vpm2.5">
+        <xs:simpleType>
+          <xs:restriction base="xs:decimal">
+            <xs:minInclusive value="-10.0"/>
+            <xs:maxInclusive value="3000.0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      
+      <xs:attribute name="co">
+        <xs:simpleType>
+          <xs:restriction base="xs:decimal">
+            <xs:minInclusive value="0.0"/>
+            <xs:maxInclusive value="3000.0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      
+      <xs:attribute name="o3">
+        <xs:simpleType>
+          <xs:restriction base="xs:decimal">
+            <xs:minInclusive value="-10.0"/>
+            <xs:maxInclusive value="3000.0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      
+      <xs:attribute name="so2">
+        <xs:simpleType>
+          <xs:restriction base="xs:decimal">
+            <xs:minInclusive value="0.0"/>
+            <xs:maxInclusive value="3000.0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      
     </xs:complexType>
   </xs:element>
 </xs:schema>

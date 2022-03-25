@@ -84,8 +84,24 @@ function createXMLRecord($array){
     $finalString = $finalString."/>";
     return $finalString;
 }
-
-//ts,nox,no2,no,pm10,nvpm10,vpm10,nvpm2.5,pm2.5,vpm2.5,co,o3,so2
+function xmlStringReFormater($string){
+    $chars = str_split($string);
+    $charsToAvoid = ["&","'"];
+    $reconstructedString = "";
+    for ($i = 0; $i < count($chars); $i++){
+        $containsFlag = true;
+        for($z = 0; $z < count($charsToAvoid); $z++){
+            if($chars[$i] == $charsToAvoid[$z]){
+                $containsFlag = false;
+            }
+        }
+        if($containsFlag){
+            $reconstructedString = $reconstructedString . $chars[$i];
+        }
+    }
+    return $reconstructedString;
+}
+//ts,nox,no2,no,pm10,nvpm10,vpm10,nvpm2.5,pm2.5,vpm2.5,co,o3,c
 function xmlWrite($xmlToCreate, $csvToPull){
     for($i = 0; $i < count($xmlToCreate); $i++){
        $flagSecondLine = true;
@@ -95,10 +111,14 @@ function xmlWrite($xmlToCreate, $csvToPull){
             $array = explode(",", $data);
             if($flagSecondLine && $count == 1){
                 //rtrim() used to mitigate a bug is cause by PHP_EOL adding a ghost char after $array[16] making "'> " move on the next line
-                $secondLine = "<station id='".$array[0]."' "."name='".$array[14]."' " . "geocode='" .$array[15]. "," . rtrim($array[16], PHP_EOL) . "'> ";
+                $secondLine = "<station id='".$array[0]."' "."name='".xmlStringReFormater($array[14])."' " . "geocode='" .$array[15]. "," . rtrim($array[16], PHP_EOL) . "'> ";
                 $secondLine = $secondLine . PHP_EOL;
                 fWrite($xmlToCreate[$i], $secondLine);
                 $flagSecondLine = false;
+                
+                $string = createXMLRecord($array);
+                fWrite($xmlToCreate[$i], $string. PHP_EOL);
+
             }elseif($count > 1){//Code to add records goes here
                 $string = createXMLRecord($array);
                 fWrite($xmlToCreate[$i], $string. PHP_EOL);
