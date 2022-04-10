@@ -58,25 +58,6 @@ function displayScatter(monthsArray){
     var chart = new google.visualization.ScatterChart(document.getElementById('chart_div'));
     chart.draw(data, options);
 }
-function displayLine(arrayData) {
-        var data = google.visualization.arrayToDataTable([
-          ['Year', 'Sales', 'Expenses'],
-          ['2004',  1000,      400],
-          ['2005',  1170,      460],
-          ['2006',  660,       1120],
-          ['2007',  1030,      540]
-        ]);
-
-        var options = {
-          title: 'Company Performance',
-          curveType: 'function',
-          legend: { position: 'bottom' }
-        };
-
-        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
-
-        chart.draw(data, options);
-      }
 
 function loadXMLDocScatter() {
     var selectStation = document.getElementById('station');
@@ -135,6 +116,87 @@ function loadXMLDocScatter() {
     xhttp.open("GET", "/WebDev1/Code/xmlFiles/" + valueStation);
     xhttp.send();
 } 
+
+function displayLine(storage, times, stations, pollutant) {
+    document.write("<br></br>");
+    document.write(Object.keys(storage[0]).length);
+    document.write("<br></br>");
+    document.write(Object.keys(storage[1]).length);
+    document.write("<br></br>");
+    document.write(Object.keys(storage[2]).length);
+    document.write("<br></br>");
+    document.write(Object.keys(storage[3]).length);
+    document.write("<br></br>");
+    document.write(Object.keys(storage[4]).length);
+    document.write("<br></br>");
+    document.write(Object.keys(storage[5]).length);
+    
+    var stationsFormated = []
+    var stationsFull = []
+    var toDelete = []
+    for (var k = 0; k < storage.length; k++){
+        var len = Object.keys(storage[k]).length; 
+        if(len == 0){
+            stationsFull.push(storage[k]);
+            toDelete.push(k);
+        }
+    }
+    for(var i = 0; i < stations.length; i++){
+        notStationToDelete = true;
+        for(var l = 0; l < toDelete.length; l++){
+            if(i == toDelete[l]){
+                notStationToDelete = false;
+            }
+        }
+        if(notStationToDelete == true){
+            split1 = stations[i].split("-");
+            split2 = split1[1].split(".");
+            stationsFormated.push(split2[0]);
+        }
+    }
+    
+    stationsFormated.unshift(pollutant);
+    var dataToDisplay = [stationsFormated]
+    
+    for(var z = 0; z < times.length; z++){
+        var data = [times[z]];
+        for(var x = 0; x < storage.length; x++){
+            for (const [key, value] of Object.entries(storage[x])) {
+                if(key.toString().trim() == times[z]){
+                    data.push(parseInt(value));
+                }
+                
+            }
+        }
+        dataToDisplay.push(data);
+    }
+    
+    var data = google.visualization.arrayToDataTable(dataToDisplay);
+
+        var options = {
+          title: 'Pollutant Levels For 6 Stations',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+          interpolateNulls: true
+        };
+
+    var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+    chart.draw(data, options);
+}
+function countUpTime(numStart, numEnd){
+    var arr = [];
+
+    for(var num = numStart; num < numEnd + 1; num++){
+        if(num.toString().length == 1){
+            arr.push("0" + num.toString());
+        }else{
+            arr.push(num.toString());
+        }
+    }
+    return arr;
+}
+
 var xmlDocs = [];
 var finishedFlag = false;
 function loadXMLDocLine() {
@@ -168,8 +230,14 @@ function loadXMLDocLine() {
     var selectDay = document.getElementById('day');
     var valueDay = selectDay.options[selectDay.selectedIndex].value;
 
+    var selectTimeLine1 = document.getElementById('timeLine1');
+    var timeLine1 = selectTimeLine1.options[selectTimeLine1.selectedIndex].value;
+
+    var selectTimeLine2 = document.getElementById('timeLine2');
+    var timeLine2 = selectTimeLine2.options[selectTimeLine2.selectedIndex].value;
+
     var selectPollutants  = document.getElementById('pollutant');
-    var valueTime = selectPollutants.options[selectPollutants.selectedIndex].value;
+    var pollutant = selectPollutants.options[selectPollutants.selectedIndex].value;
 
     const promises = [];
 
@@ -188,14 +256,39 @@ function loadXMLDocLine() {
         promises.push(ajaxPromise);
     }
     Promise.all(promises).then((xmlDocs) => {
-        
-        for(var i =0; i < xmlDocs.length; i++){
-            const recElements = xmlDoc[i].getElementsByTagName("rec");
+        start = parseInt(timeLine1);
+        end = parseInt(timeLine2);
+        times = countUpTime(start,end);
+
+        var storage = [{},{},{},{},{},{}]
+        for(var i = 0; i < xmlDocs.length; i++){
+            
+            const recElements = xmlDocs[i].getElementsByTagName("rec");
             for(var x = 0; x < recElements.length; x++){
-                
+                ts = recElements[x].getAttribute('ts');
+                dateTime = getDate(ts);
+                if(dateTime[2] == valueYear && dateTime[1] == valueMonth && dateTime[0] == valueDay){
+                    var timesFound = []
+                    for(var z = 0; z < times.length; z++){
+                        if(dateTime[3].toString().trim() == times[z].toString().trim()){
+                            
+                            if(pollutant.trim() == "nox"){
+                                storage[i][dateTime[3]] = recElements[x].getAttribute('nox');
+                            }
+                            else if(pollutant.trim() == "no"){
+                                storage[i][dateTime[3]] = recElements[x].getAttribute('no');
+                            }
+                            else if(pollutant.trim() == "no2"){
+                                storage[i][dateTime[3]] = recElements[x].getAttribute('no2');
+                            }
+                        }   
+                    }                 
+                }
             }
         }
+        displayLine(storage,times, selectedStations,pollutant);
     });
+    
 } 
 </script>
 
@@ -479,6 +572,60 @@ function loadXMLDocLine() {
     <option value="nox" selected="selected">nox</option>
     <option value="no" selected="selected">no</option>
     <option value="no2" selected="selected">no2</option>
+</select>
+<select name="timeLine1" id="timeLine1">
+    <option value="" selected="selected">Select Time</option>
+    <option value="01" selected="selected">01:00</option>
+    <option value="02" selected="selected">02:00</option>
+    <option value="03" selected="selected">03:00</option>
+    <option value="04" selected="selected">04:00</option>
+    <option value="05" selected="selected">05:00</option>
+    <option value="06" selected="selected">06:00</option>
+    <option value="07" selected="selected">07:00</option>
+    <option value="08" selected="selected">08:00</option>
+    <option value="09" selected="selected">09:00</option>
+    <option value="10" selected="selected">10:00</option>
+    <option value="11" selected="selected">11:00</option>
+    <option value="12" selected="selected">12:00</option>
+    <option value="13" selected="selected">13:00</option>
+    <option value="14" selected="selected">14:00</option>
+    <option value="15" selected="selected">15:00</option>
+    <option value="16" selected="selected">16:00</option>
+    <option value="17" selected="selected">17:00</option>
+    <option value="18" selected="selected">18:00</option>
+    <option value="19" selected="selected">19:00</option>
+    <option value="20" selected="selected">20:00</option>
+    <option value="21" selected="selected">21:00</option>
+    <option value="22" selected="selected">22:00</option>
+    <option value="23" selected="selected">23:00</option>
+    <option value="00" selected="selected">00:00</option>
+</select>
+<select name="timeLine2" id="timeLine2">
+    <option value="" selected="selected">Select Time</option>
+    <option value="01" selected="selected">01:00</option>
+    <option value="02" selected="selected">02:00</option>
+    <option value="03" selected="selected">03:00</option>
+    <option value="04" selected="selected">04:00</option>
+    <option value="05" selected="selected">05:00</option>
+    <option value="06" selected="selected">06:00</option>
+    <option value="07" selected="selected">07:00</option>
+    <option value="08" selected="selected">08:00</option>
+    <option value="09" selected="selected">09:00</option>
+    <option value="10" selected="selected">10:00</option>
+    <option value="11" selected="selected">11:00</option>
+    <option value="12" selected="selected">12:00</option>
+    <option value="13" selected="selected">13:00</option>
+    <option value="14" selected="selected">14:00</option>
+    <option value="15" selected="selected">15:00</option>
+    <option value="16" selected="selected">16:00</option>
+    <option value="17" selected="selected">17:00</option>
+    <option value="18" selected="selected">18:00</option>
+    <option value="19" selected="selected">19:00</option>
+    <option value="20" selected="selected">20:00</option>
+    <option value="21" selected="selected">21:00</option>
+    <option value="22" selected="selected">22:00</option>
+    <option value="23" selected="selected">23:00</option>
+    <option value="00" selected="selected">00:00</option>
 </select>
 <button onclick="loadXMLDocLine()">Populate Line Graph</button>
 
