@@ -1,4 +1,9 @@
+<!DOCTYPE html>
 
+<html>
+    <head>
+    </head>
+<body>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
 
@@ -23,7 +28,8 @@ function getDate(timeStamp){
 }
 
 google.charts.load('current', {'packages':['corechart']});
-google.charts.setOnLoadCallback(drawChart);
+//google.charts.setOnLoadCallback(drawChart);
+
 function average(theArray){
     var lenArray = theArray.length;
     var runningTotal = 0;
@@ -117,51 +123,42 @@ function loadXMLDocScatter() {
     xhttp.send();
 } 
 
-function displayLine(storage, times, stations, pollutant) {
-    document.write("<br></br>");
-    document.write(Object.keys(storage[0]).length);
-    document.write("<br></br>");
-    document.write(Object.keys(storage[1]).length);
-    document.write("<br></br>");
-    document.write(Object.keys(storage[2]).length);
-    document.write("<br></br>");
-    document.write(Object.keys(storage[3]).length);
-    document.write("<br></br>");
-    document.write(Object.keys(storage[4]).length);
-    document.write("<br></br>");
-    document.write(Object.keys(storage[5]).length);
-    
+function displayLine(storage, times, stations, pollutant, day,month,year) {   
     var stationsFormated = []
-    var stationsFull = []
-    var toDelete = []
-    for (var k = 0; k < storage.length; k++){
-        var len = Object.keys(storage[k]).length; 
-        if(len == 0){
-            stationsFull.push(storage[k]);
-            toDelete.push(k);
-        }
-    }
+    var stationListNotEmpty = []
+    var stationsDataNotEmpty = []
+    var stationsEmpty = []
+
     for(var i = 0; i < stations.length; i++){
-        notStationToDelete = true;
-        for(var l = 0; l < toDelete.length; l++){
-            if(i == toDelete[l]){
-                notStationToDelete = false;
+        split1 = stations[i].split("-");
+        split2 = split1[1].split(".");
+        stationsFormated.push(split2[0]);
+    }
+
+    for (var k = 0; k < storage.length; k++){
+        var empty = false;
+        for (const [key, value] of Object.entries(storage[k])) {
+            if(value == null){
+                empty = true;
+            }else{
+                empty = false;
             }
-        }
-        if(notStationToDelete == true){
-            split1 = stations[i].split("-");
-            split2 = split1[1].split(".");
-            stationsFormated.push(split2[0]);
+        } 
+        if(empty == false){
+            stationsDataNotEmpty.push(storage[k]);
+            stationListNotEmpty.push(stationsFormated[k]);
+        }else{
+            stationsEmpty.push(stationsFormated[k]);
         }
     }
     
-    stationsFormated.unshift(pollutant);
-    var dataToDisplay = [stationsFormated]
+    stationListNotEmpty.unshift(pollutant);
+    var dataToDisplay = [stationListNotEmpty]
     
     for(var z = 0; z < times.length; z++){
         var data = [times[z]];
-        for(var x = 0; x < storage.length; x++){
-            for (const [key, value] of Object.entries(storage[x])) {
+        for(var x = 0; x < stationsDataNotEmpty.length; x++){
+            for (const [key, value] of Object.entries(stationsDataNotEmpty[x])) {
                 if(key.toString().trim() == times[z]){
                     data.push(parseInt(value));
                 }
@@ -174,29 +171,47 @@ function displayLine(storage, times, stations, pollutant) {
     var data = google.visualization.arrayToDataTable(dataToDisplay);
 
         var options = {
-          title: 'Pollutant Levels For 6 Stations',
-          curveType: 'function',
-          legend: { position: 'bottom' }
-          interpolateNulls: true
+          title: pollutant + " " + "Pollutant Levels For 6 Stations for the date: " + day + "-" + month + "-" + year,
+          curveType: "function",
+          legend: { position: "bottom"},
+          interpolateNulls: true,
+          hAxis: {title: "Time (24hr) " + " \n " + "(No Data for time specified: "  + stationsEmpty + ")"},
+          vAxis: {title: pollutant + " Levels"}
         };
 
-    var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+    var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
 
     chart.draw(data, options);
 }
 function countUpTime(numStart, numEnd){
     var arr = [];
-
+    if(numEnd == 0){
+        numEnd = 24;
+    }
     for(var num = numStart; num < numEnd + 1; num++){
         if(num.toString().length == 1){
             arr.push("0" + num.toString());
         }else{
-            arr.push(num.toString());
+            if(num == 24){
+                arr.push("00");
+            }else{
+                arr.push(num.toString());
+            }
+            
         }
     }
     return arr;
 }
-
+function timeCheck(time1,time2){
+    if(parseInt(time2) == 0){
+        time2 = 24;
+    }
+    if(parseInt(time1) >= parseInt(time2)){
+        return false;//Invalid time
+    }else{
+        return true;//Valid time
+    }
+}
 var xmlDocs = [];
 var finishedFlag = false;
 function loadXMLDocLine() {
@@ -240,55 +255,64 @@ function loadXMLDocLine() {
     var pollutant = selectPollutants.options[selectPollutants.selectedIndex].value;
 
     const promises = [];
+    
+    var checkPassed = timeCheck(timeLine1,timeLine2);
+    if(checkPassed == true){
+        for(var i = 0; i < selectedStations.length; i++){
+            let ajaxPromise = new Promise(function(myResolve, myReject) {
+                const xhttp = new XMLHttpRequest();
+                xhttp.onload = function() {
+                    myResolve(this.responseXML);
+                }
+                xhttp.onerror = function() {
+                    myReject("error");
+                }
+                xhttp.open("GET", "/WebDev1/Code/xmlFiles/" + selectedStations[i]);
+                xhttp.send();
+            });
+            promises.push(ajaxPromise);
+        }
+        Promise.all(promises).then((xmlDocs) => {
+            start = parseInt(timeLine1);
+            end = parseInt(timeLine2);
+            times = countUpTime(start,end);
+            var storage = [{},{},{},{},{},{}];
 
-    for(var i = 0; i < selectedStations.length; i++){
-        let ajaxPromise = new Promise(function(myResolve, myReject) {
-            const xhttp = new XMLHttpRequest();
-            xhttp.onload = function() {
-                myResolve(this.responseXML);
-            }
-            xhttp.onerror = function() {
-                myReject("error");
-            }
-            xhttp.open("GET", "/WebDev1/Code/xmlFiles/" + selectedStations[i]);
-            xhttp.send();
-        });
-        promises.push(ajaxPromise);
-    }
-    Promise.all(promises).then((xmlDocs) => {
-        start = parseInt(timeLine1);
-        end = parseInt(timeLine2);
-        times = countUpTime(start,end);
-
-        var storage = [{},{},{},{},{},{}]
-        for(var i = 0; i < xmlDocs.length; i++){
-            
-            const recElements = xmlDocs[i].getElementsByTagName("rec");
-            for(var x = 0; x < recElements.length; x++){
-                ts = recElements[x].getAttribute('ts');
-                dateTime = getDate(ts);
-                if(dateTime[2] == valueYear && dateTime[1] == valueMonth && dateTime[0] == valueDay){
-                    var timesFound = []
-                    for(var z = 0; z < times.length; z++){
-                        if(dateTime[3].toString().trim() == times[z].toString().trim()){
-                            
-                            if(pollutant.trim() == "nox"){
-                                storage[i][dateTime[3]] = recElements[x].getAttribute('nox');
-                            }
-                            else if(pollutant.trim() == "no"){
-                                storage[i][dateTime[3]] = recElements[x].getAttribute('no');
-                            }
-                            else if(pollutant.trim() == "no2"){
-                                storage[i][dateTime[3]] = recElements[x].getAttribute('no2');
-                            }
-                        }   
-                    }                 
+            //Populate storage with null values
+            for(var k = 0; k < storage.length; k++){
+                for(var h = 0; h< times.length; h++){
+                    storage[k][times[h]] = null;
                 }
             }
-        }
-        displayLine(storage,times, selectedStations,pollutant);
-    });
-    
+
+            for(var i = 0; i < xmlDocs.length; i++){
+                
+                const recElements = xmlDocs[i].getElementsByTagName("rec");
+                for(var x = 0; x < recElements.length; x++){
+                    ts = recElements[x].getAttribute('ts');
+                    dateTime = getDate(ts);
+                    if(dateTime[2] == valueYear && dateTime[1] == valueMonth && dateTime[0] == valueDay){
+                        for(var z = 0; z < times.length; z++){
+                            if(dateTime[3].toString().trim() == times[z].toString().trim()){
+                                if(pollutant.trim() == "nox"){
+                                    storage[i][dateTime[3].toString().trim()] = recElements[x].getAttribute('nox');
+                                }
+                                else if(pollutant.trim() == "no"){
+                                    storage[i][dateTime[3].toString().trim()] = recElements[x].getAttribute('no');
+                                }
+                                else if(pollutant.trim() == "no2"){
+                                    storage[i][dateTime[3].toString().trim()] = recElements[x].getAttribute('no2');
+                                }
+                            }   
+                        }                 
+                    }
+                }
+            }
+            displayLine(storage,times, selectedStations,pollutant, valueDay,valueMonth,valueYear);
+        });
+    }else{
+        alert("Invalid Times");
+    }
 } 
 </script>
 
@@ -488,28 +512,6 @@ function loadXMLDocLine() {
     <option value="data-500.xml" selected="selected">data-500</option>
     <option value="data-501.xml" selected="selected">data-501</option>
 </select>
-
-<select name="station6" id="station6">
-    <option value="" selected="selected">Select Station</option>
-    <option value="data-188.xml" selected="selected">data-188</option>
-    <option value="data-203.xml" selected="selected">data-203</option>
-    <option value="data-206.xml" selected="selected">data-206</option>
-    <option value="data-209.xml" selected="selected">data-209</option>
-    <option value="data-213.xml" selected="selected">data-213</option>
-    <option value="data-215.xml" selected="selected">data-215</option>
-    <option value="data-228.xml" selected="selected">data-228</option>
-    <option value="data-270.xml" selected="selected">data-270</option>
-    <option value="data-271.xml" selected="selected">data-271</option>
-    <option value="data-375.xml" selected="selected">data-375</option>
-    <option value="data-395.xml" selected="selected">data-395</option>
-    <option value="data-447.xml" selected="selected">data-447</option>
-    <option value="data-452.xml" selected="selected">data-452</option>
-    <option value="data-459.xml" selected="selected">data-459</option>
-    <option value="data-463.xml" selected="selected">data-463</option>
-    <option value="data-481.xml" selected="selected">data-481</option>
-    <option value="data-500.xml" selected="selected">data-500</option>
-    <option value="data-501.xml" selected="selected">data-501</option>
-</select>
 <select name="year2" id="year2">
     <option value="" selected="selected">Select Year</option>
     <option value="2015" selected="selected">2015</option>
@@ -598,7 +600,6 @@ function loadXMLDocLine() {
     <option value="21" selected="selected">21:00</option>
     <option value="22" selected="selected">22:00</option>
     <option value="23" selected="selected">23:00</option>
-    <option value="00" selected="selected">00:00</option>
 </select>
 <select name="timeLine2" id="timeLine2">
     <option value="" selected="selected">Select Time</option>
@@ -629,8 +630,9 @@ function loadXMLDocLine() {
 </select>
 <button onclick="loadXMLDocLine()">Populate Line Graph</button>
 
+<div class="main">
 <div id="chart_div" style="width: 900px; height: 500px;"></div>
-<div id="curve_chart" style="width: 900px; height: 500px"></div>
+</div>
 
 </body>
 </html>
