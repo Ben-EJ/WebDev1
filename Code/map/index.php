@@ -3,10 +3,49 @@
   <head>
     <title>Heatmaps</title>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+  </head>
     <script>
         let map;
+
         //16 elements (Green = 0-5, Orange = 6-10 Red = 11-16)
-        const colours = ["#ccffcc","#80ff80","#4dff4d","#33ff33","#00cc00","#006600",  "#ffc299", "#ff944d", "#ff6600", "#e65c00", "#b34700",  "#ff8080", "#ff3333", "#ff0000", "#cc0000", "#990000", "#2d0000", "#200000"];
+        function newColourArray(len){
+            const colours = ["#ccffcc","#80ff80","#4dff4d","#33ff33","#00cc00","#006600",  "#ffc299", "#ff944d", "#ff6600", "#e65c00", "#b34700",  "#ff8080", "#ff3333", "#ff0000", "#cc0000", "#990000"];
+
+            const newGreen = [];
+            const newOrange = [];
+            const newRed = [];
+
+            var usedGreen = false;
+            var usedOrange = false;
+            var usedRed = false; 
+
+            var currentGreen = 0;
+            var currentOrange = 6;
+            var currentRed = 11;
+
+            for(let i = 0; i < len; i++){
+                if(usedGreen == false && currentGreen != 5){
+                    newGreen.push(colours[currentGreen]);
+                    currentGreen = currentGreen + 1;
+                    usedGreen = true;
+                }
+                else if(usedOrange == false && currentOrange != 10){
+                    newOrange.push(colours[currentOrange]);
+                    currentOrange = currentOrange + 1;
+                    usedOrange = true;
+                }
+                else if(currentRed != 15){
+                    newRed.push(colours[currentRed]);
+                    currentRed = currentRed + 1;
+                    usedGreen = false;
+                    usedOrange = false;
+                }
+            }
+            console.log(newGreen);
+            console.log(newOrange);
+            console.log(newRed);
+            return newGreen.concat(newOrange,newRed);
+        }
         function generateMarker(map,location, pollutantAmt, colour){
             return new google.maps.Marker({
                 position: location,
@@ -35,8 +74,8 @@
         function initMap() {
             console.log("initStart");
             map = new google.maps.Map(document.getElementById("map"), {
-                center: { lat: 51.4278638883, lng: -2.56374153315 },
-                zoom: 8,
+                center: { lat: 51.4545, lng: -2.5879 },
+                zoom: 12,
             });
 
             var selectYear = document.getElementById('year');
@@ -72,51 +111,87 @@
                 promises.push(ajaxPromise);
             }
             Promise.all(promises).then((xmlDocs) => {
-                var timeToInt = parseInt(time);
                 console.log("Promises Complete");
-                data = []
+                var data = [];
                 for(var i = 0; i < xmlDocs.length; i++){
                     const station = xmlDocs[i].getElementsByTagName("station");
                     const recElements = xmlDocs[i].getElementsByTagName("rec");
                     for(var x = 0; x < recElements.length; x++){
-                        
                         ts = recElements[x].getAttribute('ts');
                         dateTime = getDate(ts);
                         if(dateTime[2] == valueYear && dateTime[1] == valueMonth && dateTime[0] == valueDay){
-                            if(dateTime[3].toString().trim() == timeToInt.toString().trim()){
+                            if(dateTime[3].toString().trim() == time.trim()){
                                 var latLonRaw = station[0].getAttribute('geocode');
                                 if(pollutant.trim() == "nox"){
                                     var thePolNOX = recElements[x].getAttribute('nox');
-                                    data.push([thePolNOX,latLonRaw]);
-                                    console.log("Found");
-                                   
+                                    if(thePolNOX == null){
+                                        console.log(thePolNOX);
+                                    }else{
+                                        data.push([thePolNOX,latLonRaw]);
+                                        console.log("Found");
+                                    }
                                 }
                                 else if(pollutant.trim() == "no"){
                                     var thePolNO = recElements[x].getAttribute('no');
-                                    data.push([thePolNO,latLonRaw]);
-                                    console.log("Found");
-                                    
+                                    if(thePolNO == null){
+                                        console.log(thePolNO);
+                                    }else{
+                                        data.push([thePolNO,latLonRaw]);
+                                        console.log("Found");
+                                    }
                                 }
                                 else if(pollutant.trim() == "no2"){
                                     var thePolNO2 = recElements[x].getAttribute('no2');
-                                    data.push([thePolNO2,latLonRaw]);
-                                    console.log("Found");
-                                    
+                                    if(thePolNO2 == null){
+                                        console.log(thePolNO2);
+                                    }else{
+                                        data.push([thePolNO2,latLonRaw]);
+                                        console.log("Found");
+                                    }
                                 }
                             }                    
                         }
                     }
                 }
-                data.sort(function(a, b) {
+                
+                var sorted = data.sort(function(a, b) {
                     return a[0] - b[0];
                 });
-                console.log(data);
+                
+                console.log(sorted);
+                colours = newColourArray(sorted.length);
+                console.log(colours);
+                for(let i = 0; i < sorted.length; i++){
+                    var array = sorted[i][1].split(",");
+                    console.log(array);
+                    generateMarker(map, { lat: parseFloat(array[0]), lng: parseFloat(array[1]) }, sorted[i][0], colours[i]);
+                }
+
+                var colourTable = document.getElementById("colourTable");
+                colourTable.innerHTML = "";
+                for(let i = 0; i < colours.length; i++){
+                   var row = colourTable.insertRow();
+                   var cellA = row.insertCell(0);
+                   var cellB = row.insertCell(1);
+                   
+                   cellA.innerHTML = '<div class="colorCell" style="background-color:' +  colours[i] + ';"></div>';
+                   if(i == 0){
+                        cellB.innerHTML = parseInt(data[0][0].toString());
+                   }else if(i == colours.length - 2){
+                        cellB.innerHTML = "v";
+                   }
+                   else if(i == colours.length - 1){
+                        cellB.innerHTML = parseInt(data[data.length - 1][0]);
+                   }else{
+                        cellB.innerHTML = "|";
+                   }
+                }
             });
         }
         window.initMap = initMap;
         
     </script>
-  </head>
+  
   <body>
     <style>
         html, body {
@@ -124,15 +199,44 @@
         margin: 0;
         padding: 0;
         }
+        .MainMapDiv{
+            top:25%;
+            left:25%;
+            height:100%;
+            width:100%;
+            position: absolute;
+        }
         #map {
-            top:30%;
-            left:30%;
             height:50%;
             width:50%;
         }
+        table {
+            border: 1px solid black;
+        }
+        td {
+            width: 10px;
+            text-align: center;
+            padding: 5px;
+        }
+        .ColourTable{
+            top:10%;
+            left:50%;
+            position: absolute;
+        }
+        .colorCell{
+            padding: 15px;
+            height:20%;
+            width:40%;
+        }
     </style>
+    <div class="MainMapDiv">
     <select name="year" id="year">
     <option value="" selected="selected">Select Year</option>
+    <option value="2010" selected="selected">2010</option>
+    <option value="2011" selected="selected">2011</option>
+    <option value="2012" selected="selected">2012</option>
+    <option value="2013" selected="selected">2013</option>
+    <option value="2014" selected="selected">2014</option>
     <option value="2015" selected="selected">2015</option>
     <option value="2016" selected="selected">2016</option>
     <option value="2017" selected="selected">2017</option>
@@ -221,7 +325,11 @@
     <option value="23" selected="selected">23:00</option>
     </select>
     <button onclick="initMap()">Generate Map</button>
+
+    
     <div id="map"></div>
+    <div class="ColourTable"><table id="colourTable"></table></div>
+    </div>
 
     <script
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBy3DhKi_LhOqHmhS-HEbtw6nO63vt5HDc&v=weekly"
