@@ -120,10 +120,20 @@ function xmlWrite($xmlToCreate, $csvToPull){
                 fWrite($xmlToCreate[$i], $string. PHP_EOL);
 
             }elseif($count > 1){//Code to add records goes here
+               //siteID,ts,nox,no2,no,pm10,nvpm10,vpm10,nvpm2.5,pm2.5,vpm2.5,co,o3,so2,loc,lat,long
+                if ( $array[2] !== ";" || $array[4] !== ";" && $array[3] !== ";"){
                 $string = createXMLRecord($array);
                 fWrite($xmlToCreate[$i], $string. PHP_EOL);
+                }
             }
             $count++;
+        }
+        if($count == 1){
+            $splitStationFileName = explode("/", stream_get_meta_data($xmlToCreate[$i])["uri"])[1];
+            $splitStation = explode("-", $splitStationFileName)[1];
+            $splitStationNumber = explode(".", $splitStation)[0];
+            $secondLine = "<station id='".$splitStationNumber."' "."name='"."NO-DATA"."' " . "geocode='"."NO-DATA"."'> ";
+            fWrite($xmlToCreate[$i], $secondLine. PHP_EOL);
         }
         fWrite($xmlToCreate[$i], "</station>". PHP_EOL);
     }

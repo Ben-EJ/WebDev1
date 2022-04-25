@@ -50,6 +50,7 @@
             <xs:enumeration value="Fishponds Road" />
             <xs:enumeration value="Temple Way" />
             <xs:enumeration value="Colston Avenue" />
+            <xs:enumeration value="NO-DATA" />
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
