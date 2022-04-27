@@ -1,0 +1,33 @@
+.main{
+    top:35%;
+    left:30%;
+    height:50%;
+    width:50%;
+    position: absolute;
+}
+.selectChartType{
+    top:-10%;
+    left:20%;
+    height:100%;
+    width:100%;
+    position: absolute;
+}
+.options{
+    top:15%;
+    right:100%;
+    height:50%;
+    width:10%;
+    position: absolute;
+}
+.scatterMain{
+
+}
+.chart1MainDiv{
+    
+}
+.stationsChart2{
+
+}
+.dateTimeChart2{
+
+}
