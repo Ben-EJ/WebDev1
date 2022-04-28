@@ -1,9 +1,11 @@
 # ATIWD2 Report
 ## Parsing methods
+
+### DOM
 There are many methods of parsing files like XML. The first being DOM, this is where the document is treated like tree data struckture, where in nodes of said tree, represent a given part of the document (MDN, 2022). This method of document parsing is supported by many languages, such as Javascript and Python.
-### Example of DOM with HTML and Javascript
+#### Example of DOM with HTML and Javascript
 Here is an example of how this can be used in Javascript/HTML:
-#### HTML Example:
+##### HTML Example:
 ```
 <!DOCTYPE html>
 <html>
@@ -16,7 +18,7 @@ Here is an example of how this can be used in Javascript/HTML:
     </body>
 </html>
 ```
-#### Javascript Example:
+##### Javascript Example:
 ```
 function addOption(){
     var scatterOptions = document.getElementById('favouriteFood'); // Get element of html document
@@ -28,10 +30,10 @@ function addOption(){
 ```
 As can be seen in the code above, ```document.getElementById``` gets an element within the document by its id. This can then be utalised within Javascript to add a new option to the selection box. 
 
-### Example of DOM with XML and Javascript
+#### Example of DOM with XML and Javascript
 DOM also can be used with XML for example:
 
-#### XML Document Example:
+##### XML Document Example:
 ```
 <?xml version='1.0' encoding='UTF-8' ?>
 <menu name="Lunch Menu">
@@ -42,7 +44,8 @@ DOM also can be used with XML for example:
 </menu>
 ```
 
-#### Javascript Example:
+##### Javascript Example:
+
 ```
 function printMenu(fileName){
     const xhttp = new XMLHttpRequest(); // Create new XML Http Request.
@@ -60,7 +63,10 @@ function printMenu(fileName){
     xhttp.send();
 }
 ```
-As can be seen from the code above it is possible to use XML with
+As can be seen from the code above it is possible to use DOM with XML, ```getElementsByTagName``` is used to get all foodItem tags from the XML document and ```getAttribute``` is used to obtain the attrabutes of said tags.
+
+### SAX
+
 
 ## How Charting Can Be Enhanced. 
 ### Genralistation
