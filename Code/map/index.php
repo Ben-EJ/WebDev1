@@ -6,6 +6,12 @@
     <script type="text/javascript" src="maps.js"></script>
     <link rel="stylesheet" href="maps.css" />
     <meta charset="utf-8">
+
+    <script type="text/javascript" src="init.js"></script>
+    <script type="text/javascript">
+        window.onload = init;
+    </script>
+
   </head>  
 
   <body>

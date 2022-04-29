@@ -1,15 +1,16 @@
-
+// Function to make scatter chart options visable
 function visibleScatter(){
     var scatterOptions = document.getElementById('scatterMain');
-    scatterOptions.style.display = "block";
+    scatterOptions.hidden = false;
 
     var lineOptions = document.getElementById('lineMain');
-    lineOptions.style.display = "none";
+    lineOptions.hidden = true;
 }
+// Function to make line chart options visable
 function visibleLine(){
     var scatterOptions = document.getElementById('scatterMain');
-    scatterOptions.style.display = "none";
+    scatterOptions.hidden = true;
 
     var lineOptions = document.getElementById('lineMain');
-    lineOptions.style.display = "block";
+    lineOptions.hidden = false;
 }

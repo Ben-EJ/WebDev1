@@ -8,6 +8,7 @@ function normalizeToXML()
     location.href = '/WebDev1/Code/normalize-to-xml.php'; 
 }
 
+// Converts Unix timestamp back into readable date and time.
 function getDate(timeStamp){
     var date = new Date(timeStamp * 1000);
     var humanReadableDate = date.toLocaleString(); 
@@ -22,6 +23,7 @@ function getDate(timeStamp){
 google.charts.load('current', {'packages':['corechart']});
 //google.charts.setOnLoadCallback(drawChart);
 
+// Function to find average of values in a given array
 function average(theArray){
     var lenArray = theArray.length;
     var runningTotal = 0;
@@ -30,8 +32,14 @@ function average(theArray){
     }
     return runningTotal / lenArray;
 }
+
+// Builds and displays Scatter chart based on input array 
 function displayScatter(monthsArray){
-    parser = new DOMParser();
+    //Next two lines delete any pre existing charts and hide the No Data Img.
+    document.getElementById("chart_div").innerHTML = "";
+    document.getElementById('NoDataImg').hidden = true;
+    
+    // Formats data into array to be visualised by chart
     var data = google.visualization.arrayToDataTable([
         ['Month', 'NO Levels'],
         [1,monthsArray[0]],
@@ -47,17 +55,19 @@ function displayScatter(monthsArray){
         [11,monthsArray[10]],
         [12,monthsArray[11]]
     ]);
+    // Sets options for charts.
     var options = {
         title: 'A scatter chart to show a years worth of data (averaged by month) from a specific station for Carbon Monoxide.',
         hAxis: {title: 'Month', minValue: 0, maxValue: 12},
         vAxis: {title: 'NO Levels', minValue: 0, maxValue: Math.max(monthsArray)},
         legend: 'none'
     };
-    var chart = new google.visualization.ScatterChart(document.getElementById('chart_div'));
-    chart.draw(data, options);
+    var chart = new google.visualization.ScatterChart(document.getElementById('chart_div'));// Selects chart div in html document.
+    chart.draw(data, options);//Draws chart.
 }
-
+// Processes XML doc to turn into a scatter chart.
 function loadXMLDocScatter() {
+    // Bellow lines of code get and store data from the UI options on HTML page.
     var selectStation = document.getElementById('station');
     var valueStation = selectStation.options[selectStation.selectedIndex].value;
 
@@ -67,6 +77,7 @@ function loadXMLDocScatter() {
     var selectTime = document.getElementById('time');
     var valueTime = selectTime.options[selectTime.selectedIndex].value;
     
+    // Creates new XMLHttpRequest 
     const xhttp = new XMLHttpRequest();
     
     xhttp.onreadystatechange = function() {
@@ -85,21 +96,22 @@ function loadXMLDocScatter() {
             "12": []
         };
         var finished = false;
-        if (this.readyState == 4 && this.status == 200) {
+        if (this.readyState == 4 && this.status == 200) {// When file is received: 
             const xmlDoc = this.responseXML;
-            const x = xmlDoc.getElementsByTagName("rec");
+            const x = xmlDoc.getElementsByTagName("rec");// Get all rec elements and store in array.
             let txt = "";
-            for (let i = 0; i < x.length; i++) {
-                ts = x[i].getAttribute('ts');
-                dateTime = getDate(ts);
-                no = x[i].getAttribute('no');
-                if(dateTime[2].trim() == valueYear && dateTime[3].trim() == valueTime){
-                    monthArray[dateTime[1].toString()].push(no);
+            for (let i = 0; i < x.length; i++) {// For all rec elements
+                ts = x[i].getAttribute('ts');// Get the ts attrabute.
+                dateTime = getDate(ts); // Convert Unix timestamp into readable data and time.
+                no = x[i].getAttribute('no'); // Get no attrabute from rec element.
+                if(dateTime[2].trim() == valueYear && dateTime[3].trim() == valueTime){// If the year and time is correct then
+                    monthArray[dateTime[1].toString()].push(no); // Store NO data in monthArray. 
                 }
             }
             finished = true;
         };
-        if(finished == true){
+        if(finished == true){// When all data has been added to monthArray then:
+            //Average all months in year and store in monthAverages array.
             const monthAverages = []
             for(const [key, value] of Object.entries(monthArray)){
                 if(value.length != 0){
@@ -108,92 +120,114 @@ function loadXMLDocScatter() {
                     monthAverages.push(0);
                 } 
             }
-            displayScatter(monthAverages)
+            displayScatter(monthAverages); // Display the scatter chart.
         }
     }
     xhttp.open("GET", "/WebDev1/Code/xmlFiles/" + valueStation);
     xhttp.send();
 } 
-
-function displayLine(storage, times, stations, pollutant, day,month,year) {   
-    var stationsFormated = []
-    var stationListNotEmpty = []
-    var stationsDataNotEmpty = []
-    var stationsEmpty = []
-
+// Function gets station number from station xml file name.
+function getStationNumber(stations){
+    var stationsFormated = [];
     for(var i = 0; i < stations.length; i++){
         split1 = stations[i].split("-");
         split2 = split1[1].split(".");
         stationsFormated.push(split2[0]);
     }
+    return stationsFormated;
+}
+// Function to display line chart.
+function displayLine(storage, times, stations, pollutant, day,month,year) {   
+    //Next two lines delete any pre existing charts and hide the No Data Img.
+    document.getElementById("chart_div").innerHTML = "";
+    document.getElementById('NoDataImg').hidden = true;
 
-    for (var k = 0; k < storage.length; k++){
+    var stationsFormated = getStationNumber(stations);
+    var stationListNotEmpty = [];
+    var stationsDataNotEmpty = [];
+    var stationsEmpty = [];
+    // Sorts both the names of the stations and station data into an array,
+    // based on whether a given station has data or not.
+    for (var k = 0; k < storage.length; k++){// For each station in storage
         var empty = false;
-        for (const [key, value] of Object.entries(storage[k])) {
+        for (const [key, value] of Object.entries(storage[k])) {// Check to see if station has data.
             if(value == null){
                 empty = true;
             }else{
                 empty = false;
             }
         } 
-        if(empty == false){
-            stationsDataNotEmpty.push(storage[k]);
-            stationListNotEmpty.push(stationsFormated[k]);
+        if(empty == false){// If the station has data:
+            // Append station name and data to respective arrays.
+            stationsDataNotEmpty.push(storage[k]); // Append data
+            stationListNotEmpty.push(stationsFormated[k]); // Append station name.
         }else{
+            // Append station name to stationsEmpty array if the station has no data.
             stationsEmpty.push(stationsFormated[k]);
         }
     }
-    
-    stationListNotEmpty.unshift(pollutant);
-    var dataToDisplay = [stationListNotEmpty]
-    
-    for(var z = 0; z < times.length; z++){
-        var data = [times[z]];
-        for(var x = 0; x < stationsDataNotEmpty.length; x++){
-            for (const [key, value] of Object.entries(stationsDataNotEmpty[x])) {
-                if(key.toString().trim() == times[z]){
-                    data.push(parseInt(value));
+    if(stationsEmpty.length != 6){ // Ensures atleast one station has data.
+        stationListNotEmpty.unshift(pollutant); // Inserts pollutant at begining of stationListNotEmpty array.
+        var dataToDisplay = [stationListNotEmpty]
+         
+        for(var z = 0; z < times.length; z++){ 
+            var data = [times[z]];// Adds the time to beginning of the array.
+            // Next few lines of code add data from a given station for a spesific time,
+            // if it matches the current time in the times[z] array.
+            for(var x = 0; x < stationsDataNotEmpty.length; x++){
+                for (const [key, value] of Object.entries(stationsDataNotEmpty[x])) {
+                    if(key.toString().trim() == times[z]){
+                        data.push(parseInt(value));
+                    }
+                    
                 }
-                
             }
+            dataToDisplay.push(data);
         }
-        dataToDisplay.push(data);
+        
+        // next few lines of code create line chart.
+        var data = google.visualization.arrayToDataTable(dataToDisplay);
+
+            var options = {
+            title: pollutant + " " + "Pollutant Levels For 6 Stations for the date: " + day + "-" + month + "-" + year,
+            curveType: "function",
+            legend: { position: "bottom"},
+            interpolateNulls: true,
+            hAxis: {title: "Time (24hr) " + " \n " + "(No Data for time specified: "  + stationsEmpty + ")"},
+            vAxis: {title: pollutant + " Levels"}
+            };
+
+        var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+
+        chart.draw(data, options);
+    }else{
+        // Display no data image if none of the stations have any data for the parameters selected.
+        document.getElementById('NoDataImg').hidden = false;
     }
-    
-    var data = google.visualization.arrayToDataTable(dataToDisplay);
-
-        var options = {
-          title: pollutant + " " + "Pollutant Levels For 6 Stations for the date: " + day + "-" + month + "-" + year,
-          curveType: "function",
-          legend: { position: "bottom"},
-          interpolateNulls: true,
-          hAxis: {title: "Time (24hr) " + " \n " + "(No Data for time specified: "  + stationsEmpty + ")"},
-          vAxis: {title: pollutant + " Levels"}
-        };
-
-    var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-
-    chart.draw(data, options);
 }
+// Function is used to get all hours inbetween start and end times.
 function countUpTime(numStart, numEnd){
     var arr = [];
+    // If the end number is 0 then it is the equivelent to 24 hours therefore numEnd is set to 24.
     if(numEnd == 0){
         numEnd = 24;
     }
+    // Count up from numStart to numEnd.
     for(var num = numStart; num < numEnd + 1; num++){
-        if(num.toString().length == 1){
+        if(num.toString().length == 1){// if the length of number is 1 then append 0 to start of number
             arr.push("0" + num.toString());
         }else{
-            if(num == 24){
+            // if a 2 digit number append straight to output array.
+            if(num == 24){// Convert 24 into 00
                 arr.push("00");
             }else{
                 arr.push(num.toString());
-            }
-            
+            } 
         }
     }
     return arr;
 }
+// Function ensures that time2 is not greater than time1
 function timeCheck(time1,time2){
     if(parseInt(time2) == 0){
         time2 = 24;
@@ -206,9 +240,10 @@ function timeCheck(time1,time2){
 }
 var xmlDocs = [];
 var finishedFlag = false;
+// Loads XML data from XML document to be used to produce line graph.
 function loadXMLDocLine() {
     var selectedStations = [];
-
+    // Next lines obtain user input data and store in a given variable.
     var selectStation1 = document.getElementById('station1');
     selectedStations.push(selectStation1.options[selectStation1.selectedIndex].value);
 
@@ -246,12 +281,15 @@ function loadXMLDocLine() {
     var selectPollutants  = document.getElementById('pollutant');
     var pollutant = selectPollutants.options[selectPollutants.selectedIndex].value;
 
-    const promises = [];
-    
+    const promises = [];// Stores promises.
+
+    // Checks user input and ensures timeLine2 is not greater than timeLine1.
     var checkPassed = timeCheck(timeLine1,timeLine2);
-    if(checkPassed == true){
-        for(var i = 0; i < selectedStations.length; i++){
-            let ajaxPromise = new Promise(function(myResolve, myReject) {
+
+    if(checkPassed == true){// If the time check is passed then:
+        // For each of the selected stations get XML document:
+        for(var i = 0; i < selectedStations.length; i++){ 
+            let ajaxPromise = new Promise(function(myResolve, myReject) {// Create new promise
                 const xhttp = new XMLHttpRequest();
                 xhttp.onload = function() {
                     myResolve(this.responseXML);
@@ -264,7 +302,7 @@ function loadXMLDocLine() {
             });
             promises.push(ajaxPromise);
         }
-        Promise.all(promises).then((xmlDocs) => {
+        Promise.all(promises).then((xmlDocs) => {// After all promises are complete:
             start = parseInt(timeLine1);
             end = parseInt(timeLine2);
             times = countUpTime(start,end);
@@ -277,15 +315,17 @@ function loadXMLDocLine() {
                 }
             }
 
-            for(var i = 0; i < xmlDocs.length; i++){
-                
-                const recElements = xmlDocs[i].getElementsByTagName("rec");
-                for(var x = 0; x < recElements.length; x++){
-                    ts = recElements[x].getAttribute('ts');
-                    dateTime = getDate(ts);
+            for(var i = 0; i < xmlDocs.length; i++){// For each XML Document.
+                const recElements = xmlDocs[i].getElementsByTagName("rec");// Gets rec elements from XML document.
+                for(var x = 0; x < recElements.length; x++){// For all rec elements:
+                    ts = recElements[x].getAttribute('ts');// Gets unixtime stamp.
+                    dateTime = getDate(ts); // converts unixtime stamp back into readable date and time.
+                    // If recs date matches that of the users inputed date then.
                     if(dateTime[2] == valueYear && dateTime[1] == valueMonth && dateTime[0] == valueDay){
-                        for(var z = 0; z < times.length; z++){
+                        for(var z = 0; z < times.length; z++){// For each of the chosen times.
+                            // If the time of the rec element is inbetween the times selected by the user then:
                             if(dateTime[3].toString().trim() == times[z].toString().trim()){
+                                //Add the data to the storage array depending on the selected polutant by user.
                                 if(pollutant.trim() == "nox"){
                                     storage[i][dateTime[3].toString().trim()] = recElements[x].getAttribute('nox');
                                 }
@@ -300,6 +340,7 @@ function loadXMLDocLine() {
                     }
                 }
             }
+            //Display line graph.
             displayLine(storage,times, selectedStations,pollutant, valueDay,valueMonth,valueYear);
         });
     }else{

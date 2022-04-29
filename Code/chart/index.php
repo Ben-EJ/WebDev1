@@ -5,29 +5,20 @@
     <script type="text/javascript" src="chart.js"></script>
     <script type="text/javascript" src="divHandle.js"></script>
     <link rel="stylesheet" href="chart.css" />
+
+    <script type="text/javascript" src="init.js"></script>
     <script type="text/javascript">
-        function init() {
-
-            if(document.getElementById('scatter').checked == false){
-                var scatterOptions = document.getElementById('scatterMain');
-                scatterOptions.style.display = "none";
-            }else{
-                var scatterOptions = document.getElementById('scatterMain');
-                scatterOptions.style.display = "block";
-            }
-
-            if(document.getElementById('line').checked == false){
-                var lineOptions = document.getElementById('lineMain');
-                lineOptions.style.display = "none";
-            }else{
-                var lineOptions = document.getElementById('lineMain');
-                lineOptions.style.display = "block";
-            }
+        window.onload=function(){
+            init();
+            initCharts();
         }
-        window.onload = init;
     </script>
+
     </head>
 <body>
+<img id="loadingBodyImg" src="loadingCharts.jpg" alt="Loading" style="width: 900px; height: 500px;">
+<div id="wholeBody">
+
 <h1>Charts</h1>
 <button onclick="extractToCSV()">Extract To CSV</button>
 <button onclick="normalizeToXML()">Normalize To XML</button>
@@ -40,30 +31,14 @@
 <input type="radio" id="line" name="selectChart" value="line" onclick="visibleLine()">
 <label for="line">Line Chart</label><br> 
 </div>
-<div id="chart_div" style="width: 900px; height: 500px;"></div>
 
+<div id="chart_div" style="width: 900px; height: 500px;">
+</div>
+<img id="NoDataImg" src="NoData.jpg" alt="No Data" style="width: 900px; height: 500px;">
 <div class="options">
     <div id="scatterMain">
         <select name="station" id="station">
             <option value="" selected="selected">Select Station</option>
-            <option value="data-188.xml" selected="selected">data-188</option>
-            <option value="data-203.xml" selected="selected">data-203</option>
-            <option value="data-206.xml" selected="selected">data-206</option>
-            <option value="data-209.xml" selected="selected">data-209</option>
-            <option value="data-213.xml" selected="selected">data-213</option>
-            <option value="data-215.xml" selected="selected">data-215</option>
-            <option value="data-228.xml" selected="selected">data-228</option>
-            <option value="data-270.xml" selected="selected">data-270</option>
-            <option value="data-271.xml" selected="selected">data-271</option>
-            <option value="data-375.xml" selected="selected">data-375</option>
-            <option value="data-395.xml" selected="selected">data-395</option>
-            <option value="data-447.xml" selected="selected">data-447</option>
-            <option value="data-452.xml" selected="selected">data-452</option>
-            <option value="data-459.xml" selected="selected">data-459</option>
-            <option value="data-463.xml" selected="selected">data-463</option>
-            <option value="data-481.xml" selected="selected">data-481</option>
-            <option value="data-500.xml" selected="selected">data-500</option>
-            <option value="data-501.xml" selected="selected">data-501</option>
         </select>
 
         <select name="year" id="year">
@@ -112,129 +87,21 @@
         <div class="stationsChart2">
             <select name="station1" id="station1">
                 <option value="" selected="selected">Select Station</option>
-                <option value="data-188.xml" selected="selected">data-188</option>
-                <option value="data-203.xml" selected="selected">data-203</option>
-                <option value="data-206.xml" selected="selected">data-206</option>
-                <option value="data-209.xml" selected="selected">data-209</option>
-                <option value="data-213.xml" selected="selected">data-213</option>
-                <option value="data-215.xml" selected="selected">data-215</option>
-                <option value="data-228.xml" selected="selected">data-228</option>
-                <option value="data-270.xml" selected="selected">data-270</option>
-                <option value="data-271.xml" selected="selected">data-271</option>
-                <option value="data-375.xml" selected="selected">data-375</option>
-                <option value="data-395.xml" selected="selected">data-395</option>
-                <option value="data-447.xml" selected="selected">data-447</option>
-                <option value="data-452.xml" selected="selected">data-452</option>
-                <option value="data-459.xml" selected="selected">data-459</option>
-                <option value="data-463.xml" selected="selected">data-463</option>
-                <option value="data-481.xml" selected="selected">data-481</option>
-                <option value="data-500.xml" selected="selected">data-500</option>
-                <option value="data-501.xml" selected="selected">data-501</option>
             </select>
             <select name="station2" id="station2">
                 <option value="" selected="selected">Select Station</option>
-                <option value="data-188.xml" selected="selected">data-188</option>
-                <option value="data-203.xml" selected="selected">data-203</option>
-                <option value="data-206.xml" selected="selected">data-206</option>
-                <option value="data-209.xml" selected="selected">data-209</option>
-                <option value="data-213.xml" selected="selected">data-213</option>
-                <option value="data-215.xml" selected="selected">data-215</option>
-                <option value="data-228.xml" selected="selected">data-228</option>
-                <option value="data-270.xml" selected="selected">data-270</option>
-                <option value="data-271.xml" selected="selected">data-271</option>
-                <option value="data-375.xml" selected="selected">data-375</option>
-                <option value="data-395.xml" selected="selected">data-395</option>
-                <option value="data-447.xml" selected="selected">data-447</option>
-                <option value="data-452.xml" selected="selected">data-452</option>
-                <option value="data-459.xml" selected="selected">data-459</option>
-                <option value="data-463.xml" selected="selected">data-463</option>
-                <option value="data-481.xml" selected="selected">data-481</option>
-                <option value="data-500.xml" selected="selected">data-500</option>
-                <option value="data-501.xml" selected="selected">data-501</option>
             </select>
             <select name="station3" id="station3">
                 <option value="" selected="selected">Select Station</option>
-                <option value="data-188.xml" selected="selected">data-188</option>
-                <option value="data-203.xml" selected="selected">data-203</option>
-                <option value="data-206.xml" selected="selected">data-206</option>
-                <option value="data-209.xml" selected="selected">data-209</option>
-                <option value="data-213.xml" selected="selected">data-213</option>
-                <option value="data-215.xml" selected="selected">data-215</option>
-                <option value="data-228.xml" selected="selected">data-228</option>
-                <option value="data-270.xml" selected="selected">data-270</option>
-                <option value="data-271.xml" selected="selected">data-271</option>
-                <option value="data-375.xml" selected="selected">data-375</option>
-                <option value="data-395.xml" selected="selected">data-395</option>
-                <option value="data-447.xml" selected="selected">data-447</option>
-                <option value="data-452.xml" selected="selected">data-452</option>
-                <option value="data-459.xml" selected="selected">data-459</option>
-                <option value="data-463.xml" selected="selected">data-463</option>
-                <option value="data-481.xml" selected="selected">data-481</option>
-                <option value="data-500.xml" selected="selected">data-500</option>
-                <option value="data-501.xml" selected="selected">data-501</option>
             </select>
             <select name="station4" id="station4">
                 <option value="" selected="selected">Select Station</option>
-                <option value="data-188.xml" selected="selected">data-188</option>
-                <option value="data-203.xml" selected="selected">data-203</option>
-                <option value="data-206.xml" selected="selected">data-206</option>
-                <option value="data-209.xml" selected="selected">data-209</option>
-                <option value="data-213.xml" selected="selected">data-213</option>
-                <option value="data-215.xml" selected="selected">data-215</option>
-                <option value="data-228.xml" selected="selected">data-228</option>
-                <option value="data-270.xml" selected="selected">data-270</option>
-                <option value="data-271.xml" selected="selected">data-271</option>
-                <option value="data-375.xml" selected="selected">data-375</option>
-                <option value="data-395.xml" selected="selected">data-395</option>
-                <option value="data-447.xml" selected="selected">data-447</option>
-                <option value="data-452.xml" selected="selected">data-452</option>
-                <option value="data-459.xml" selected="selected">data-459</option>
-                <option value="data-463.xml" selected="selected">data-463</option>
-                <option value="data-481.xml" selected="selected">data-481</option>
-                <option value="data-500.xml" selected="selected">data-500</option>
-                <option value="data-501.xml" selected="selected">data-501</option>
             </select>
             <select name="station5" id="station5">
                 <option value="" selected="selected">Select Station</option>
-                <option value="data-188.xml" selected="selected">data-188</option>
-                <option value="data-203.xml" selected="selected">data-203</option>
-                <option value="data-206.xml" selected="selected">data-206</option>
-                <option value="data-209.xml" selected="selected">data-209</option>
-                <option value="data-213.xml" selected="selected">data-213</option>
-                <option value="data-215.xml" selected="selected">data-215</option>
-                <option value="data-228.xml" selected="selected">data-228</option>
-                <option value="data-270.xml" selected="selected">data-270</option>
-                <option value="data-271.xml" selected="selected">data-271</option>
-                <option value="data-375.xml" selected="selected">data-375</option>
-                <option value="data-395.xml" selected="selected">data-395</option>
-                <option value="data-447.xml" selected="selected">data-447</option>
-                <option value="data-452.xml" selected="selected">data-452</option>
-                <option value="data-459.xml" selected="selected">data-459</option>
-                <option value="data-463.xml" selected="selected">data-463</option>
-                <option value="data-481.xml" selected="selected">data-481</option>
-                <option value="data-500.xml" selected="selected">data-500</option>
-                <option value="data-501.xml" selected="selected">data-501</option>
             </select>
             <select name="station6" id="station6">
                 <option value="" selected="selected">Select Station</option>
-                <option value="data-188.xml" selected="selected">data-188</option>
-                <option value="data-203.xml" selected="selected">data-203</option>
-                <option value="data-206.xml" selected="selected">data-206</option>
-                <option value="data-209.xml" selected="selected">data-209</option>
-                <option value="data-213.xml" selected="selected">data-213</option>
-                <option value="data-215.xml" selected="selected">data-215</option>
-                <option value="data-228.xml" selected="selected">data-228</option>
-                <option value="data-270.xml" selected="selected">data-270</option>
-                <option value="data-271.xml" selected="selected">data-271</option>
-                <option value="data-375.xml" selected="selected">data-375</option>
-                <option value="data-395.xml" selected="selected">data-395</option>
-                <option value="data-447.xml" selected="selected">data-447</option>
-                <option value="data-452.xml" selected="selected">data-452</option>
-                <option value="data-459.xml" selected="selected">data-459</option>
-                <option value="data-463.xml" selected="selected">data-463</option>
-                <option value="data-481.xml" selected="selected">data-481</option>
-                <option value="data-500.xml" selected="selected">data-500</option>
-                <option value="data-501.xml" selected="selected">data-501</option>
             </select>
         </div>
 
@@ -364,7 +231,7 @@
     </div>
 </div>
 </div>
-
+    </div>
 </body>
 </html>
 

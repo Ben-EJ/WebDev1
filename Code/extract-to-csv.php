@@ -11,6 +11,7 @@ function home()
 { 
     location.href = 'chart/index.php'; 
 }
+//Add in try-catch blocks in apropreate places, have own error handler.
 </script>
 
 <button onclick="home()">Home</button>
@@ -46,55 +47,59 @@ $csvToCreate = array(
 
 $fileHeader = "siteID,ts,nox,no2,no,pm10,nvpm10,vpm10,nvpm2.5,pm2.5,vpm2.5,co,o3,so2,loc,lat,long" . PHP_EOL;
 
+// This function splits a given line in a CSV file into an array containing each feild in row.
 function multiSpliter($string){
     $array = array();
-    $chars = str_split($string);
+    $chars = str_split($string);// Split string into array of chars.
     $entry = "";
     $count = count($chars);
-    for($i = 0; $i < $count + 1; $i++){
-        if($count == $i && $entry != ""){
+    for($i = 0; $i < $count + 1; $i++){// loop through all chars in array.
+        if($count == $i && $entry != ""){ // Appends final entry.
             array_push($array, $entry);
         } 
-        else if($chars[$i] == ","){
+        else if($chars[$i] == ","){ // Handles commas.
             array_push($array, $entry);
             $entry = "";
         } 
         else if($chars[$i] == ";"){
-            if($entry != ""){
+            if($entry != ""){// If entry is not empty then entry must be complete.
                 array_push($array, $entry);
-            }else{
+            }else{ // If entry is empty then the field must be blank.
                 array_push($array,";");
             }
             $entry = "";
         }  
         else{
-            $entry = $entry . $chars[$i];
+            $entry = $entry . $chars[$i]; // Constructs entry char by char.
         }
     }
     return $array;
 }
-function convertToTimeStamp($dateTime){//2004-05-14T07:00:00+00:00
+
+// Converts date and time into a Unix Time stamp
+function convertToTimeStamp($dateTime){
     $dataSplit = array();
     $dataSplitFurther = array();
     $dataSplit =  explode("T", $dateTime);
     $dataSplitFurther = explode("+", $dataSplit[1]);
     return strtotime($dataSplit[0]." ".$dataSplitFurther[0]);
  }
-//4 element is 
+// Handles sorting the CSV data from main file into subsequent smaller CSV files.
 function sortCsv($csvToCreate, $fileHeader){
 
-    foreach($csvToCreate as &$initalCSV){
+    foreach($csvToCreate as &$initalCSV){// appends header for each new CSV file.
         fwrite($initalCSV, $fileHeader);
     }
     $file = fopen("air-quality-data-2004-2019.csv","r");
     $flagSkipedFirst = false;
-    while ($data = fgets($file)) {
-        if($flagSkipedFirst){
+    while ($data = fgets($file)) {// For each line in air-quality-data-2004-2019 CSV file.
+        if($flagSkipedFirst){// Skips first row as it contains the file header.
             $dataSplitArray = array();
-            $dataSplitArray = multiSpliter($data);
-            $date = convertToTimeStamp($dataSplitArray[0]);
-    
-            if($dataSplitArray[11] != ";" || $dataSplitArray[1] != ";"){
+            $dataSplitArray = multiSpliter($data);// Splits row from CSV into an array
+            $date = convertToTimeStamp($dataSplitArray[0]); //Converts date and time from air-quality-data-2004-2019 csv file to Unix timestamp
+            
+            //Next section of code reformats the CSV data row into new CSV row format and writes to file.
+            if($dataSplitArray[11] != ";" || $dataSplitArray[1] != ";"){ 
                 $reformated = 
                 $dataSplitArray[4]  . "," .  $date  . ","
               . $dataSplitArray[1]  . "," .  $dataSplitArray[2]  . ","
@@ -112,6 +117,7 @@ function sortCsv($csvToCreate, $fileHeader){
         $flagSkipedFirst = true;
     }
 }
+// Code use to check time taken to complete task.
 $st = microtime(true);
 sortCsv($csvToCreate,$fileHeader);
 echo '<p>It took ';
