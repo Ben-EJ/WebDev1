@@ -1,8 +1,7 @@
-# ATIWD2 Report
+# **ATIWD2 Report**
 ## Parsing methods
-
-### DOM
-There are many methods of parsing files like XML. The first being DOM, this is where the document is treated like tree data struckture, where in nodes of said tree, represent a given part of the document (MDN, 2022). This method of document parsing is supported by many languages, such as Javascript and Python.
+### DOM 
+There are many methods of parsing files like XML that exist in a whole range of programming languages. The first of which being DOM. This is where the document is treated like tree data structure, where in nodes of said tree, represent a given part of the document (MDN, 2022). This method of document parsing is supported by many languages, such as Javascript and Python.
 #### Example of DOM with HTML and Javascript
 Here is an example of how this can be used in Javascript/HTML:
 ##### HTML Example:
@@ -45,7 +44,7 @@ DOM also can be used with XML for example:
 ```
 
 ##### Javascript Example:
-
+***Using DOM and AJAX***
 ```
 function printMenu(fileName){
     const xhttp = new XMLHttpRequest(); // Create new XML Http Request.
@@ -66,7 +65,13 @@ function printMenu(fileName){
 As can be seen from the code above it is possible to use DOM with XML, ```getElementsByTagName``` is used to get all foodItem tags from the XML document and ```getAttribute``` is used to obtain the attrabutes of said tags.
 
 ### SAX
+Another parsing method, commonly refered to as SAX or "Simple API for XML" is an event-driven method of acessing XML documents (Oracle). It is most notably used in Java. It is used in a veriety of applications but most notably network oriented programs as it is that fastest and least memory intensive method when dealing with XML documents besides StAX also refered to as the Streaming API for XML (Oracle).
 
+### Stream Oreiented parsers 
+A streams oriented parser unlike a DOM parser does not transmit and represent the whole document in a tree format and storing the whole thing in memory (Oracle). Instead it transmits the XML infosets where the are sent and parsed serially when the application is run (Oracle). One example of a steam oreiented parser can be found in php, or more spesifically the XMLReader class where as the reader is like a cursour that moves forward along the document stream then stops at each node on the way to the end of said document (PHP).
+
+### DOM oriented parsers compared with Stream Oreiented Parsers
+There are many diffrences, advantages and disadvatages to both DOM parsers and Stream orented parsers. Most notably as previously stated, DOM parsers represent an entire document in a tree like data structure, storing the whole thing in memory. Where as the stream oreiented aproach XML infosets are sent and parsed serially, the main advatage of the serial aproach is it uses less memory as the Document is not stored in it's entirety at the same time. This is not an issue with smaller documents, but the larger the document, the worse this will become. Furthermore the time taken for the document to be transmited will also increase as the documents size increases (oricle). Therefore in situations where one would need to use as little memory and have as high transmition speeds as possible particularly with larger files, a stream oreiented parser would be the best aproach. However, when dealing with small files, DOM is perfectly suitable as it offers.
 
 ## How Charting Can Be Enhanced. 
 ### Genralistation
@@ -89,4 +94,13 @@ There many ways in which the product can be hosted or packedged for use in produ
 During the course of this assignment and all it's task I have gained a plethera of new knowleage, mainly about javascript and php. In terms of javascript the new knowledge includes, working with asyncrounous functions like AJAX, and using things like promises to ensure the complition of asyncronous tasks before the start of another. My general knowlage of both javascript and php has been enhanced also. For example, the diffrence in speed between functions that do similar things in php, for example, ```fgets()``` and  ```fgetcsv()```. ```fgets()``` is far quicker than ```fgetcsv()```. 
 
 # Refrences
-MDN(2022) Introduction to the DOM. Available from: https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Introduction [Accessed 28 April 2022].
+MDN (2022) Introduction to the DOM. Available from: https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Introduction [Accessed 28 April 2022].
+
+PHP (No Date) The XMLReader Class Available from:
+https://www.php.net/manual/en/class.xmlreader.php [Accessed 29 April 2022].
+
+Oracle (No Date) Java tutorials. Available from:
+https://docs.oracle.com/javase/tutorial/jaxp/sax/index.html [Accessed 29 April 2022].
+
+Oracle (No Date) Streaming Versus DOM. Available from:
+https://docs.oracle.com/cd/E19316-01/819-3669/bnbdx/index.html [Accessed 29 April 2022].
