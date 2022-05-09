@@ -25,24 +25,24 @@ ini_set('max_execution_time', '300');
 ini_set('auto_detect_line_endings', TRUE);
 
 $csvToCreate = array(
-    "188" => fopen("csvFiles/data-188.csv","w"), 
-    "203" => fopen("csvFiles/data-203.csv","w"),
-    "206" => fopen("csvFiles/data-206.csv","w"),
-    "209" => fopen("csvFiles/data-209.csv","w"),
-    "213" => fopen("csvFiles/data-213.csv","w"),
-    "215" => fopen("csvFiles/data-215.csv","w"),
-    "228" => fopen("csvFiles/data-228.csv","w"),
-    "270" => fopen("csvFiles/data-270.csv","w"),
-    "271" => fopen("csvFiles/data-271.csv","w"),
-    "375" => fopen("csvFiles/data-375.csv","w"),
-    "395" => fopen("csvFiles/data-395.csv","w"),
-    "452" => fopen("csvFiles/data-452.csv","w"),
-    "447" => fopen("csvFiles/data-447.csv","w"),
-    "459" => fopen("csvFiles/data-459.csv","w"),
-    "463" => fopen("csvFiles/data-463.csv","w"),
-    "481" => fopen("csvFiles/data-481.csv","w"),
-    "500" => fopen("csvFiles/data-500.csv","w"),
-    "501" => fopen("csvFiles/data-501.csv","w")
+    "188" => fopen("data-188.csv","w"), 
+    "203" => fopen("data-203.csv","w"),
+    "206" => fopen("data-206.csv","w"),
+    "209" => fopen("data-209.csv","w"),
+    "213" => fopen("data-213.csv","w"),
+    "215" => fopen("data-215.csv","w"),
+    "228" => fopen("data-228.csv","w"),
+    "270" => fopen("data-270.csv","w"),
+    "271" => fopen("data-271.csv","w"),
+    "375" => fopen("data-375.csv","w"),
+    "395" => fopen("data-395.csv","w"),
+    "452" => fopen("data-452.csv","w"),
+    "447" => fopen("data-447.csv","w"),
+    "459" => fopen("data-459.csv","w"),
+    "463" => fopen("data-463.csv","w"),
+    "481" => fopen("data-481.csv","w"),
+    "500" => fopen("data-500.csv","w"),
+    "501" => fopen("data-501.csv","w")
 );
 
 $fileHeader = "siteID,ts,nox,no2,no,pm10,nvpm10,vpm10,nvpm2.5,pm2.5,vpm2.5,co,o3,so2,loc,lat,long" . PHP_EOL;

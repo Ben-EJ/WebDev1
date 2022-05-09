@@ -5,56 +5,47 @@
 
     </head>
 <body>
-    
-<script>
-function home() 
-{ 
-    location.href = 'chart/index.php'; 
-}
-</script>
-
-<button onclick="home()">Home</button>
 
 <?php
 $csvToPull = array(
-    fopen("csvFiles/data-188.csv","r"), 
-    fopen("csvFiles/data-203.csv","r"),
-    fopen("csvFiles/data-206.csv","r"),
-    fopen("csvFiles/data-209.csv","r"),
-    fopen("csvFiles/data-213.csv","r"),
-    fopen("csvFiles/data-215.csv","r"),
-    fopen("csvFiles/data-228.csv","r"),
-    fopen("csvFiles/data-270.csv","r"),
-    fopen("csvFiles/data-271.csv","r"),
-    fopen("csvFiles/data-375.csv","r"),
-    fopen("csvFiles/data-395.csv","r"),
-    fopen("csvFiles/data-452.csv","r"),
-    fopen("csvFiles/data-447.csv","r"),
-    fopen("csvFiles/data-459.csv","r"),
-    fopen("csvFiles/data-463.csv","r"),
-    fopen("csvFiles/data-481.csv","r"),
-    fopen("csvFiles/data-500.csv","r"),
-    fopen("csvFiles/data-501.csv","r")
+    fopen("data-188.csv","r"), 
+    fopen("data-203.csv","r"),
+    fopen("data-206.csv","r"),
+    fopen("data-209.csv","r"),
+    fopen("data-213.csv","r"),
+    fopen("data-215.csv","r"),
+    fopen("data-228.csv","r"),
+    fopen("data-270.csv","r"),
+    fopen("data-271.csv","r"),
+    fopen("data-375.csv","r"),
+    fopen("data-395.csv","r"),
+    fopen("data-452.csv","r"),
+    fopen("data-447.csv","r"),
+    fopen("data-459.csv","r"),
+    fopen("data-463.csv","r"),
+    fopen("data-481.csv","r"),
+    fopen("data-500.csv","r"),
+    fopen("data-501.csv","r")
 );
 $xmlToCreate = array(
-    fopen("xmlFiles/data-188.xml","w"), 
-    fopen("xmlFiles/data-203.xml","w"),
-    fopen("xmlFiles/data-206.xml","w"),
-    fopen("xmlFiles/data-209.xml","w"),
-    fopen("xmlFiles/data-213.xml","w"),
-    fopen("xmlFiles/data-215.xml","w"),
-    fopen("xmlFiles/data-228.xml","w"),
-    fopen("xmlFiles/data-270.xml","w"),
-    fopen("xmlFiles/data-271.xml","w"),
-    fopen("xmlFiles/data-375.xml","w"),
-    fopen("xmlFiles/data-395.xml","w"),
-    fopen("xmlFiles/data-452.xml","w"),
-    fopen("xmlFiles/data-447.xml","w"),
-    fopen("xmlFiles/data-459.xml","w"),
-    fopen("xmlFiles/data-463.xml","w"),
-    fopen("xmlFiles/data-481.xml","w"),
-    fopen("xmlFiles/data-500.xml","w"),
-    fopen("xmlFiles/data-501.xml","w")
+    fopen("data-188.xml","w"), 
+    fopen("data-203.xml","w"),
+    fopen("data-206.xml","w"),
+    fopen("data-209.xml","w"),
+    fopen("data-213.xml","w"),
+    fopen("data-215.xml","w"),
+    fopen("data-228.xml","w"),
+    fopen("data-270.xml","w"),
+    fopen("data-271.xml","w"),
+    fopen("data-375.xml","w"),
+    fopen("data-395.xml","w"),
+    fopen("data-452.xml","w"),
+    fopen("data-447.xml","w"),
+    fopen("data-459.xml","w"),
+    fopen("data-463.xml","w"),
+    fopen("data-481.xml","w"),
+    fopen("data-500.xml","w"),
+    fopen("data-501.xml","w")
 );
 
 // Creates and opens XML files.
@@ -138,8 +129,7 @@ function xmlWrite($xmlToCreate, $csvToPull){
         }
         if($count == 1){// If CSV file is empty ensures that the XML station tags are completed regardless to produce valid XML file.
             // Gets station number out of file name
-            $splitStationFileName = explode("/", stream_get_meta_data($xmlToCreate[$i])["uri"])[1];
-            $splitStation = explode("-", $splitStationFileName)[1];
+            $splitStation = explode("-", stream_get_meta_data($xmlToCreate[$i])["uri"])[1];
             $splitStationNumber = explode(".", $splitStation)[0];
             // Creates and writes station element to file.
             $secondLine = "<station id='".$splitStationNumber."' "."name='"."NO-DATA"."' " . "geocode='"."NO-DATA"."'> ";
@@ -149,11 +139,10 @@ function xmlWrite($xmlToCreate, $csvToPull){
     }
 }
 // Code use to check time taken to complete task.
-$st = microtime(true);
+
 xmlCreate($xmlToCreate);
 xmlWrite($xmlToCreate, $csvToPull);
-echo '<p>It took ';
-echo microtime(true) - $st;
+
 ?>
 </body>
 </html>

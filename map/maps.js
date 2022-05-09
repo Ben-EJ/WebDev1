@@ -11,7 +11,6 @@ function newColourArray(len){
 
     var usedGreen = false;
     var usedOrange = false;
-    var usedRed = false; 
 
     var currentGreen = 0;
     var currentOrange = 6;
@@ -147,6 +146,7 @@ function initMap() {
     map = new google.maps.Map(document.getElementById("map"), {
         center: { lat: 51.4545, lng: -2.5879 },
         zoom: 12,
+        draggable: false
     });
     // Next few lines take user input and store in variables.
     var selectYear = document.getElementById('year');
@@ -177,7 +177,7 @@ function initMap() {
             xhttp.onerror = function() {
                 myReject("error");
             }
-            xhttp.open("GET", "/WebDev1/Code/xmlFiles/" + dataXML[i]);
+            xhttp.open("GET","/" + dataXML[i]);
             xhttp.send();
         });
         promises.push(ajaxPromise);
@@ -263,6 +263,7 @@ function initMapColourEncodings() {
     map = new google.maps.Map(document.getElementById("map"), {
         center: { lat: 51.4545, lng: -2.5879 },
         zoom: 12,
+        draggable: false
     });
     // Next few lines take user input and store in variables.
     var selectYear = document.getElementById('year');
@@ -292,7 +293,7 @@ function initMapColourEncodings() {
             xhttp.onerror = function() {
                 myReject("error");
             }
-            xhttp.open("GET", "/WebDev1/Code/xmlFiles/" + dataXML[i]);
+            xhttp.open("GET","/" + dataXML[i]);
             xhttp.send();
         });
         promises.push(ajaxPromise);
@@ -354,5 +355,4 @@ function initMapColourEncodings() {
         generateTableKey(colourEncodings, 0, 601);
     });
 }
-
 window.initMap = initMap;

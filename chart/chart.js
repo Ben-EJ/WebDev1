@@ -1,11 +1,11 @@
 
 function extractToCSV() 
 { 
-    location.href = '/WebDev1/Code/extract-to-csv.php'; 
+    location.href = 'extract-to-csv.php'; 
 }
 function normalizeToXML() 
 { 
-    location.href = '/WebDev1/Code/normalize-to-xml.php'; 
+    location.href = 'normalize-to-xml.php'; 
 }
 
 // Converts Unix timestamp back into readable date and time.
@@ -123,7 +123,7 @@ function loadXMLDocScatter() {
             displayScatter(monthAverages); // Display the scatter chart.
         }
     }
-    xhttp.open("GET", "/WebDev1/Code/xmlFiles/" + valueStation);
+    xhttp.open("GET","/" + valueStation);
     xhttp.send();
 } 
 // Function gets station number from station xml file name.
@@ -297,7 +297,7 @@ function loadXMLDocLine() {
                 xhttp.onerror = function() {
                     myReject("error");
                 }
-                xhttp.open("GET", "/WebDev1/Code/xmlFiles/" + selectedStations[i]);
+                xhttp.open("GET","/" + selectedStations[i]);
                 xhttp.send();
             });
             promises.push(ajaxPromise);

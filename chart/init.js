@@ -25,7 +25,7 @@ function init() {
           xhttp.onerror = function() {
               myReject("error");
           }
-          xhttp.open("GET", "/WebDev1/Code/xmlFiles/" + stations[i]);
+          xhttp.open("GET","/" + stations[i]);
           xhttp.send();
       });
       promises.push(ajaxPromise);

@@ -7,11 +7,6 @@
     <link rel="stylesheet" href="maps.css" />
     <meta charset="utf-8">
 
-    <script type="text/javascript" src="init.js"></script>
-    <script type="text/javascript">
-        window.onload = init;
-    </script>
-
   </head>  
 
   <body>
@@ -19,11 +14,6 @@
   <div class="Options">
     <select name="year" id="year" class="button">
     <option value="" selected="selected">Select Year</option>
-    <option value="2010" selected="selected">2010</option>
-    <option value="2011" selected="selected">2011</option>
-    <option value="2012" selected="selected">2012</option>
-    <option value="2013" selected="selected">2013</option>
-    <option value="2014" selected="selected">2014</option>
     <option value="2015" selected="selected">2015</option>
     <option value="2016" selected="selected">2016</option>
     <option value="2017" selected="selected">2017</option>
