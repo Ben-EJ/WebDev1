@@ -5,17 +5,6 @@
     </head>
 <body>
 <h1>Generated CSV</h1>
-
-<script>
-function home() 
-{ 
-    location.href = 'chart/index.php'; 
-}
-//Add in try-catch blocks in apropreate places, have own error handler.
-</script>
-
-<button onclick="home()">Home</button>
-
 <?php
 
 @date_default_timezone_set("GMT");

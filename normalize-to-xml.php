@@ -139,10 +139,11 @@ function xmlWrite($xmlToCreate, $csvToPull){
     }
 }
 // Code use to check time taken to complete task.
-
+$st = microtime(true);
 xmlCreate($xmlToCreate);
 xmlWrite($xmlToCreate, $csvToPull);
-
+echo '<p>It took ';
+echo microtime(true) - $st;
 ?>
 </body>
 </html>

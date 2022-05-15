@@ -76,55 +76,58 @@ function loadXMLDocScatter() {
 
     var selectTime = document.getElementById('time');
     var valueTime = selectTime.options[selectTime.selectedIndex].value;
-    
-    // Creates new XMLHttpRequest 
-    const xhttp = new XMLHttpRequest();
-    
-    xhttp.onreadystatechange = function() {
-        const monthArray = {
-            "01": [],
-            "02": [],
-            "03": [],
-            "04": [],
-            "05": [],
-            "06": [],
-            "07": [],
-            "08": [],
-            "09": [],
-            "10": [],
-            "11": [],
-            "12": []
-        };
-        var finished = false;
-        if (this.readyState == 4 && this.status == 200) {// When file is received: 
-            const xmlDoc = this.responseXML;
-            const x = xmlDoc.getElementsByTagName("rec");// Get all rec elements and store in array.
-            let txt = "";
-            for (let i = 0; i < x.length; i++) {// For all rec elements
-                ts = x[i].getAttribute('ts');// Get the ts attrabute.
-                dateTime = getDate(ts); // Convert Unix timestamp into readable data and time.
-                no = x[i].getAttribute('no'); // Get no attrabute from rec element.
-                if(dateTime[2].trim() == valueYear && dateTime[3].trim() == valueTime){// If the year and time is correct then
-                    monthArray[dateTime[1].toString()].push(no); // Store NO data in monthArray. 
+    if(valueStation != ""){
+        // Creates new XMLHttpRequest 
+        const xhttp = new XMLHttpRequest();
+        
+        xhttp.onreadystatechange = function() {
+            const monthArray = {
+                "01": [],
+                "02": [],
+                "03": [],
+                "04": [],
+                "05": [],
+                "06": [],
+                "07": [],
+                "08": [],
+                "09": [],
+                "10": [],
+                "11": [],
+                "12": []
+            };
+            var finished = false;
+            if (this.readyState == 4 && this.status == 200) {// When file is received: 
+                const xmlDoc = this.responseXML;
+                const x = xmlDoc.getElementsByTagName("rec");// Get all rec elements and store in array.
+                let txt = "";
+                for (let i = 0; i < x.length; i++) {// For all rec elements
+                    ts = x[i].getAttribute('ts');// Get the ts attrabute.
+                    dateTime = getDate(ts); // Convert Unix timestamp into readable data and time.
+                    no = x[i].getAttribute('no'); // Get no attrabute from rec element.
+                    if(dateTime[2].trim() == valueYear && dateTime[3].trim() == valueTime){// If the year and time is correct then
+                        monthArray[dateTime[1].toString()].push(no); // Store NO data in monthArray. 
+                    }
                 }
+                finished = true;
+            };
+            if(finished == true){// When all data has been added to monthArray then:
+                //Average all months in year and store in monthAverages array.
+                const monthAverages = []
+                for(const [key, value] of Object.entries(monthArray)){
+                    if(value.length != 0){
+                        monthAverages.push(average(value));
+                    }else{
+                        monthAverages.push(0);
+                    } 
+                }
+                displayScatter(monthAverages); // Display the scatter chart.
             }
-            finished = true;
-        };
-        if(finished == true){// When all data has been added to monthArray then:
-            //Average all months in year and store in monthAverages array.
-            const monthAverages = []
-            for(const [key, value] of Object.entries(monthArray)){
-                if(value.length != 0){
-                    monthAverages.push(average(value));
-                }else{
-                    monthAverages.push(0);
-                } 
-            }
-            displayScatter(monthAverages); // Display the scatter chart.
         }
+        xhttp.open("GET","/" + valueStation);
+        xhttp.send();
+    }else{
+        alert("Please Select Station");
     }
-    xhttp.open("GET","/" + valueStation);
-    xhttp.send();
 } 
 // Function gets station number from station xml file name.
 function getStationNumber(stations){
@@ -285,65 +288,68 @@ function loadXMLDocLine() {
 
     // Checks user input and ensures timeLine2 is not greater than timeLine1.
     var checkPassed = timeCheck(timeLine1,timeLine2);
-
-    if(checkPassed == true){// If the time check is passed then:
-        // For each of the selected stations get XML document:
-        for(var i = 0; i < selectedStations.length; i++){ 
-            let ajaxPromise = new Promise(function(myResolve, myReject) {// Create new promise
-                const xhttp = new XMLHttpRequest();
-                xhttp.onload = function() {
-                    myResolve(this.responseXML);
-                }
-                xhttp.onerror = function() {
-                    myReject("error");
-                }
-                xhttp.open("GET","/" + selectedStations[i]);
-                xhttp.send();
-            });
-            promises.push(ajaxPromise);
-        }
-        Promise.all(promises).then((xmlDocs) => {// After all promises are complete:
-            start = parseInt(timeLine1);
-            end = parseInt(timeLine2);
-            times = countUpTime(start,end);
-            var storage = [{},{},{},{},{},{}];
-
-            //Populate storage with null values
-            for(var k = 0; k < storage.length; k++){
-                for(var h = 0; h< times.length; h++){
-                    storage[k][times[h]] = null;
-                }
+    if(selectedStations[0] != "" && selectedStations[1] != "" && selectedStations[2] != "" && selectedStations[3] != "" && selectedStations[4] != "" && selectedStations[5] != ""){
+        if(checkPassed == true){// If the time check is passed then:
+            // For each of the selected stations get XML document:
+            for(var i = 0; i < selectedStations.length; i++){ 
+                let ajaxPromise = new Promise(function(myResolve, myReject) {// Create new promise
+                    const xhttp = new XMLHttpRequest();//Create to XML Http Request
+                    xhttp.onload = function() {//Resolve function
+                        myResolve(this.responseXML);
+                    }
+                    xhttp.onerror = function() {//Error function
+                        myReject("error");
+                    }
+                    xhttp.open("GET","/" + selectedStations[i]);// Open selected XML Files.
+                    xhttp.send();
+                });
+                promises.push(ajaxPromise);
             }
+            Promise.all(promises).then((xmlDocs) => {// After all promises are complete:
+                start = parseInt(timeLine1);
+                end = parseInt(timeLine2);
+                times = countUpTime(start,end);
+                var storage = [{},{},{},{},{},{}];
 
-            for(var i = 0; i < xmlDocs.length; i++){// For each XML Document.
-                const recElements = xmlDocs[i].getElementsByTagName("rec");// Gets rec elements from XML document.
-                for(var x = 0; x < recElements.length; x++){// For all rec elements:
-                    ts = recElements[x].getAttribute('ts');// Gets unixtime stamp.
-                    dateTime = getDate(ts); // converts unixtime stamp back into readable date and time.
-                    // If recs date matches that of the users inputed date then.
-                    if(dateTime[2] == valueYear && dateTime[1] == valueMonth && dateTime[0] == valueDay){
-                        for(var z = 0; z < times.length; z++){// For each of the chosen times.
-                            // If the time of the rec element is inbetween the times selected by the user then:
-                            if(dateTime[3].toString().trim() == times[z].toString().trim()){
-                                //Add the data to the storage array depending on the selected polutant by user.
-                                if(pollutant.trim() == "nox"){
-                                    storage[i][dateTime[3].toString().trim()] = recElements[x].getAttribute('nox');
-                                }
-                                else if(pollutant.trim() == "no"){
-                                    storage[i][dateTime[3].toString().trim()] = recElements[x].getAttribute('no');
-                                }
-                                else if(pollutant.trim() == "no2"){
-                                    storage[i][dateTime[3].toString().trim()] = recElements[x].getAttribute('no2');
-                                }
-                            }   
-                        }                 
+                //Populate storage with null values
+                for(var k = 0; k < storage.length; k++){
+                    for(var h = 0; h< times.length; h++){
+                        storage[k][times[h]] = null;
                     }
                 }
-            }
-            //Display line graph.
-            displayLine(storage,times, selectedStations,pollutant, valueDay,valueMonth,valueYear);
-        });
+
+                for(var i = 0; i < xmlDocs.length; i++){// For each XML Document.
+                    const recElements = xmlDocs[i].getElementsByTagName("rec");// Gets rec elements from XML document.
+                    for(var x = 0; x < recElements.length; x++){// For all rec elements:
+                        ts = recElements[x].getAttribute('ts');// Gets unixtime stamp.
+                        dateTime = getDate(ts); // converts unixtime stamp back into readable date and time.
+                        // If recs date matches that of the users inputed date then.
+                        if(dateTime[2] == valueYear && dateTime[1] == valueMonth && dateTime[0] == valueDay){
+                            for(var z = 0; z < times.length; z++){// For each of the chosen times.
+                                // If the time of the rec element is inbetween the times selected by the user then:
+                                if(dateTime[3].toString().trim() == times[z].toString().trim()){
+                                    //Add the data to the storage array depending on the selected polutant by user.
+                                    if(pollutant.trim() == "nox"){
+                                        storage[i][dateTime[3].toString().trim()] = recElements[x].getAttribute('nox');
+                                    }
+                                    else if(pollutant.trim() == "no"){
+                                        storage[i][dateTime[3].toString().trim()] = recElements[x].getAttribute('no');
+                                    }
+                                    else if(pollutant.trim() == "no2"){
+                                        storage[i][dateTime[3].toString().trim()] = recElements[x].getAttribute('no2');
+                                    }
+                                }   
+                            }                 
+                        }
+                    }
+                }
+                //Display line graph.
+                displayLine(storage,times, selectedStations,pollutant, valueDay,valueMonth,valueYear);
+            });
+        }else{
+            alert("Invalid Times");
+        }
     }else{
-        alert("Invalid Times");
+        alert("Please Select all stations");
     }
 } 
